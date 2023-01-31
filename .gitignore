@@ -1,0 +1,39 @@
+# Binaries for programs and plugins
+*.exe
+*.exe~
+*.dll
+*.so
+*.dylib
+
+# Test binary, built with `go test -c`
+*.test
+
+# Output of the go coverage tool, specifically when used with LiteIDE
+*.out
+go.sum
+
+# vscode
+.vscode
+__debug_bin
+
+# debugger for chrome
+debug.log
+
+# facebook/ent
+ent/*
+!ent/schema
+!ent/generate.go
+
+# upx build file
+*.upx
+
+# project
+config*.json
+test.db
+curl.sh
+screenshots/
+pubapis
+
+#本地项目测试文件，不包含 golang test
+*test.*
+!*test.go
