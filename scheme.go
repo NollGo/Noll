@@ -22,6 +22,7 @@ type PageInfo struct {
 
 // Repository is Github repository scheme
 type Repository struct {
+	Labels               *LabelPage      `json:"labels"`
 	DiscussionCategories *CategoryPage   `json:"discussionCategories"`
 	Discussions          *DiscussionPage `json:"discussions"`
 	Discussion           *Discussion     `json:"discussion"`
@@ -51,11 +52,12 @@ type LabelPage struct {
 
 // Label is Github label(discussion and issue) scheme
 type Label struct {
-	Color       string    `json:"color"`
-	Name        string    `json:"name"`
-	Description string    `json:"description"`
-	CreatedAt   time.Time `json:"createdAt"`
-	UpdatedAt   time.Time `json:"updatedAt"`
+	Color       string          `json:"color"`
+	Name        string          `json:"name"`
+	Description string          `json:"description"`
+	CreatedAt   time.Time       `json:"createdAt"`
+	UpdatedAt   time.Time       `json:"updatedAt"`
+	Discussions *DiscussionPage `json:"-"`
 }
 
 // DiscussionPage is Github Discussion page scheme

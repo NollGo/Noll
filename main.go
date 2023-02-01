@@ -18,6 +18,16 @@ func main() {
 	goflag.Var(&config)
 	goflag.Parse("config", "Configuration file path.")
 
+	// 标签集合
+	lables, err := getLabels(config.Owner, config.Name, config.Token)
+	if err != nil {
+		panic(err)
+	}
+	for _, lable := range lables.Nodes {
+		lable.Discussions = &DiscussionPage{}
+	}
+
+	// 分类集合
 	categories, err := getCategories(config.Owner, config.Name, config.Token)
 	if err != nil {
 		panic(err)
@@ -26,6 +36,7 @@ func main() {
 		category.Discussions = &DiscussionPage{}
 	}
 
+	// 讨论集合
 	hasNextPage := true
 	endCursor := ""
 	discussions := &DiscussionPage{}
@@ -64,6 +75,15 @@ func main() {
 					category.Discussions.TotalCount++
 				}
 			}
+
+			for _, discussLabel := range discussion.Labels.Nodes {
+				for _, label := range lables.Nodes {
+					if discussLabel.Name == label.Name {
+						label.Discussions.Nodes = append(label.Discussions.Nodes, discussion)
+						label.Discussions.TotalCount++
+					}
+				}
+			}
 		}
 
 		if 0 < discussionPage.TotalCount {
@@ -75,6 +95,10 @@ func main() {
 		// 是否有下一页
 		hasNextPage = discussionPage.PageInfo.HasNextPage
 		endCursor = discussionPage.PageInfo.EndCursor
+	}
+
+	for _, label := range lables.Nodes {
+		fmt.Println(label.Name, label.Discussions.TotalCount)
 	}
 
 	for _, category := range categories.Nodes {

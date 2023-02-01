@@ -118,6 +118,28 @@ func getCategories(owner, name, token string) (*CategoryPage, error) {
 	return result.Data.Repository.DiscussionCategories, nil
 }
 
+func getLabels(owner, name, token string) (*LabelPage, error) {
+	queryFormat := `{
+		repository(owner: "%v", name: "%v") {
+			labels(first: 100) {
+				totalCount
+				nodes {
+					color
+					name
+					description
+					createdAt
+					updatedAt
+				}
+			}
+		}
+	}`
+	var result Body
+	if err := query(fmt.Sprintf(queryFormat, owner, name), token, &result); err != nil {
+		return nil, err
+	}
+	return result.Data.Repository.Labels, nil
+}
+
 func query(body string, token string, result *Body) error {
 	req, err := http.NewRequest("POST", "https://api.github.com/graphql", strings.NewReader(queryf(body)))
 	if err != nil {
