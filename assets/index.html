@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>首页</title>
+</head>
+
+<body>
+  {{ if .Categories }}
+  <h1>分类({{ .Categories.TotalCount }})</h1>
+  <ul>
+    {{ range $i, $category := .Categories.Nodes }}
+    <li><a href="#">{{ $category.Name }}</a></li>
+    {{ end }}
+  </ul>
+  {{ end }}
+  {{ if .Labels }}
+  <h1>标签({{ .Labels.TotalCount }})</h1>
+  <ul>
+    {{ range $i, $label := .Labels.Nodes }}
+    <li><a href="#">{{ $label.Name }}</a></li>
+    {{ end }}
+  </ul>
+  {{ end }}
+  {{ if .Discussions }}
+  <h1>文章({{ .Discussions.TotalCount }})</h1>
+  <ul>
+    {{ range $i, $discussion := .Discussions.Nodes }}
+    <li><a href="{{ .discussion.URL }}">{{ $discussion.Name }}</a></li>
+    {{ end }}
+  </ul>
+  {{ end }}
+</body>
+
+</html>

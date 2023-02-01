@@ -22,10 +22,10 @@ type PageInfo struct {
 
 // Repository is Github repository scheme
 type Repository struct {
-	Labels               *LabelPage      `json:"labels"`
-	DiscussionCategories *CategoryPage   `json:"discussionCategories"`
-	Discussions          *DiscussionPage `json:"discussions"`
-	Discussion           *Discussion     `json:"discussion"`
+	Labels      *LabelPage      `json:"labels"`
+	Categories  *CategoryPage   `json:"discussionCategories"`
+	Discussions *DiscussionPage `json:"discussions"`
+	Discussion  *Discussion     `json:"discussion"`
 }
 
 // CategoryPage is Github discussion category page scheme

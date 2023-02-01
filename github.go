@@ -115,7 +115,7 @@ func getCategories(owner, name, token string) (*CategoryPage, error) {
 	if err := query(fmt.Sprintf(queryFormat, owner, name), token, &result); err != nil {
 		return nil, err
 	}
-	return result.Data.Repository.DiscussionCategories, nil
+	return result.Data.Repository.Categories, nil
 }
 
 func getLabels(owner, name, token string) (*LabelPage, error) {
