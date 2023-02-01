@@ -1,4 +1,4 @@
-module GitHubDiscussions2Blog.ThreeTenth
+module io.github.topages
 
 go 1.16
 
