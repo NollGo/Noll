@@ -37,6 +37,7 @@ type CategoryPage struct {
 // Category is Github discussion category scheme
 type Category struct {
 	Emoji       string          `json:"emoji"`
+	EmojiHTML   string          `json:"emojiHTML"`
 	Name        string          `json:"name"`
 	Description string          `json:"description"`
 	CreatedAt   time.Time       `json:"createdAt"`

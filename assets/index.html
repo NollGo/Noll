@@ -4,6 +4,39 @@
 <head>
   <meta charset="UTF-8">
   <title>首页</title>
+  <style>
+    .THUMBS_UP::before {
+      content: "👍";
+    }
+
+    .THUMBS_DOWN::before {
+      content: "👎";
+    }
+
+    .LAUGH::before {
+      content: "😄";
+    }
+
+    .HOORAY::before {
+      content: "🎉";
+    }
+
+    .CONFUSED::before {
+      content: "😕";
+    }
+
+    .HEART::before {
+      content: "❤️";
+    }
+
+    .ROCKET::before {
+      content: "🚀";
+    }
+
+    .EYES::before {
+      content: "👀";
+    }
+  </style>
 </head>
 
 <body>
@@ -14,7 +47,7 @@
   <h1>分类({{ .Repo.Categories.TotalCount }})</h1>
   <ul>
     {{ range $i, $category := .Repo.Categories.Nodes }}
-    <li><a href="#">{{ $i }}. {{ $category.Emoji }} {{ $category.Name }}</a></li>
+    <li><a href="#">{{ $i }}. {{ $category.EmojiHTML }} {{ $category.Name }}</a></li>
     {{ end }}
   </ul>
   {{ end }}
@@ -30,7 +63,16 @@
   <h1>文章({{ .Repo.Discussions.TotalCount }})</h1>
   <ul>
     {{ range $i, $discussion := .Repo.Discussions.Nodes }}
-    <li><a href="{{ $discussion.GitHubURL }}">{{ $i }}. {{ $discussion.Title }}</a></li>
+    <li><a href="{{ $discussion.GitHubURL }}">({{ $discussion.UpvoteCount }}) {{ $discussion.Title }}</a></li>
+    {{ if $discussion.ReactionGroups }}
+    <ul style="list-style-type: none">
+      {{ range $reaction := $discussion.ReactionGroups }}
+      {{ if gt $reaction.Reactors.TotalCount 0 }}
+      <li style="display: contents;"><span class="{{ $reaction.Content }}">{{ $reaction.Reactors.TotalCount }}</span></li>
+      {{ end }}
+      {{ end }}
+    </ul>
+    {{ end }}
     {{ end }}
   </ul>
   {{ end }}

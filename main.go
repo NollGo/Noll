@@ -1,10 +1,11 @@
 package main
 
 import (
-	"html/template"
+	"fmt"
 	"net/http"
 	"os"
 	"path/filepath"
+	"text/template"
 
 	"github.com/excing/goflag"
 )
@@ -66,4 +67,6 @@ func main() {
 		}))
 		http.ListenAndServe(":20000", nil)
 	}
+
+	fmt.Println("Start toPages finished")
 }

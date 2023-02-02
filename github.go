@@ -5,8 +5,16 @@ import (
 	"fmt"
 	"io/ioutil"
 	"net/http"
+	"regexp"
 	"strings"
 )
+
+func getGemoji(gemoji string) string {
+	gEmojiRegex := `<g-emoji .*>(.*)</g-emoji>`
+	regex := regexp.MustCompile(gEmojiRegex)
+	result := regex.FindStringSubmatch(gemoji)
+	return result[0]
+}
 
 func getRepository(owner, name, token string) (*Repository, error) {
 	// 标签集合
@@ -24,6 +32,7 @@ func getRepository(owner, name, token string) (*Repository, error) {
 		return nil, err
 	}
 	for _, category := range categories.Nodes {
+		category.EmojiHTML = getGemoji(category.EmojiHTML)
 		category.Discussions = &DiscussionPage{}
 	}
 
@@ -60,6 +69,7 @@ func getRepository(owner, name, token string) (*Repository, error) {
 				endCommentCursor = commentPage.PageInfo.EndCursor
 			}
 
+			discussion.Category.EmojiHTML = getGemoji(discussion.Category.EmojiHTML)
 			for _, category := range categories.Nodes {
 				if category.Name == discussion.Category.Name {
 					category.Discussions.Nodes = append(category.Discussions.Nodes, discussion)
@@ -116,6 +126,7 @@ func getDiscussionPage(owner, name, token string, afterCursor string) (*Discussi
 					}
 					category {
 						emoji
+						emojiHTML
 						name
 					}
 					labels(first: 10) {
@@ -192,6 +203,7 @@ func getCategories(owner, name, token string) (*CategoryPage, error) {
 				nodes {
 					name
 					emoji
+					emojiHTML
 					description
 				}
 				totalCount

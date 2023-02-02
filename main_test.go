@@ -2,9 +2,9 @@ package main
 
 import (
 	"fmt"
-	"html/template"
 	"os"
 	"testing"
+	"text/template"
 )
 
 func TestQueryf(t *testing.T) {
@@ -42,6 +42,12 @@ func TestRender(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+}
+
+func TestGetEmoji4GEmoji(t *testing.T) {
+	gemojiFormat := `<div></div>`
+	gemoji := `<g-emoji class="g-emoji" alias="mega" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/1f4e3.png">📣</g-emoji>`
+	t.Log(getGemoji(fmt.Sprintf(gemojiFormat, gemoji)) == gemoji)
 }
 
 func testRepository() *Repository {
