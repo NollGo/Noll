@@ -1,28 +1,77 @@
 {{define "DebugTemplate"}}
 <style>
   .debug {
-    position: absolute; /* fixed */
-    top: 0;
-    right: 0;
-    font-size: 1.6rem;
-    text-align: right;
-    text-decoration: none;
-    width: 60px;
-    height: 60px;
-    background-image: linear-gradient(to left bottom, #1d1d1d 50%, transparent 50%);
+    display: flex;
+    position: fixed;    /* absolute */
+    font-size: 1.0rem;
+    padding: 4px 12px;
+    border-radius: 0.2rem;
+    background: #515151;
+    box-shadow: 0px 0px 1px black;
   }
 
-  .debug::after {
-    content: "⛏️";
+  .debug .button {
+    text-decoration: none;
+    margin-left: 0.6rem;
+    padding: 0.1rem;
+  }
+
+  .debug .button:hover {
+    border-radius: 0.2rem;
+    background: #252525;
+  }
+
+  .debug .drop::after {
+    content: "::";
+    color: #c6c6c6;
+    font-weight: bold;
+    cursor: grab;
   }
 </style>
 <script>
+  let isDebugMenuDrop = false
   window.addEventListener('DOMContentLoaded', function () {
-    let debugMenu = document.createElement("a")
+    let debugMenu = document.createElement('div')
+    debugMenu.style.right = '10px'
+    debugMenu.style.top = '10px'
     debugMenu.classList.add('debug')
-    debugMenu.href = '/build'
-    debugMenu.onclick = function () {
-      fetch('/build')
+
+    let drop = document.createElement("span")
+    drop.classList.add('drop')
+    drop.onmousedown = function (e) {
+      isDebugMenuDrop = true
+      debugMenu.style.removeProperty('right')
+      debugMenu.style.left = `${e.clientX - 16}px`
+      debugMenu.style.top = `${e.clientY - 16}px`
+    }
+    window.onmouseup = function (e) {
+      isDebugMenuDrop = false
+    }
+    window.onmousemove = function (e) {
+      if (!isDebugMenuDrop) return
+      debugMenu.style.left = `${e.clientX - 16}px`
+      debugMenu.style.top = `${e.clientY - 16}px`
+    }
+
+    let debugRefresh = createDebugButton('⚡', '/build', 'Refresh this page')
+    let debugIncrease = createDebugButton('⛏️', '/build?mode=increase', 'Incremental update')
+    let debugFull = createDebugButton('⚒️', '/build?mode=full', 'Full update')
+
+    debugMenu.appendChild(drop)
+    debugMenu.appendChild(debugRefresh)
+    debugMenu.appendChild(debugIncrease)
+    debugMenu.appendChild(debugFull)
+    document.body.appendChild(debugMenu)
+  })
+
+  function createDebugButton(text, href, title) {
+    let debugButton = document.createElement('a')
+    debugButton.classList.add('button')
+    debugButton.innerText = text
+    debugButton.href = href
+    debugButton.title = title
+    debugButton.onclick = function () {
+      fetch(href)
         .then((resp) => {
           if (resp.ok) {
             location.reload()
@@ -32,7 +81,7 @@
         })
       return false
     }
-    document.body.appendChild(debugMenu)
-  })
+    return debugButton
+  }
 </script>
 {{end}}

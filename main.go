@@ -28,13 +28,16 @@ func main() {
 		config.Pages = config.Name
 	}
 
-	if _, err := os.Stat(config.Pages); os.IsNotExist(err) {
+	var err error
+	if _, err = os.Stat(config.Pages); os.IsNotExist(err) {
 		os.MkdirAll(config.Pages, os.ModePerm)
 	}
 
-	repository, err := getRepository(config.Owner, config.Name, config.Token)
-	if err != nil {
-		panic(err)
+	var repository *Repository
+
+	_getRepository := func() error {
+		repository, err = getRepository(config.Owner, config.Name, config.Token)
+		return err
 	}
 
 	_render := func() error {
@@ -48,15 +51,42 @@ func main() {
 			return t.Execute(dist, i)
 		})
 	}
+	if err = _getRepository(); err != nil {
+		panic(err)
+	}
 	if err = _render(); err != nil {
 		panic(err)
 	}
 
+	fmt.Println("Start toPages package finished")
+
 	if config.Debug {
+		fmt.Println("Start toPages debug mode")
 		http.Handle("/", http.StripPrefix("/", http.FileServer(http.Dir(config.Pages))))
 		// 重新编译渲染接口
 		// 调试使用
 		http.Handle("/build", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			query := r.URL.Query()
+			mode := query.Get("mode")
+			switch mode {
+			case "full":
+				// 全量更新：
+				// 删除本地所有文件，
+				// 然后从网络上获取最新数据，
+				// 再重新生成所有文件。
+			case "increase":
+				// 增量更新：
+				// 从网络上获取最新数据，
+				// 并检测本地数据是否需要更新，
+				// 如果需要，则更新，否则跳过，此操作由渲染引擎处理。
+				//
+				// 增量更新和全量更新在流程，仅是否有删除本地所有文件的区别。
+				if err = _getRepository(); err != nil {
+					w.WriteHeader(http.StatusInternalServerError)
+					w.Write([]byte(err.Error()))
+					return
+				}
+			}
 			if err = _render(); err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				w.Write([]byte(err.Error()))
@@ -67,6 +97,4 @@ func main() {
 		}))
 		http.ListenAndServe(":20000", nil)
 	}
-
-	fmt.Println("Start toPages finished")
 }
