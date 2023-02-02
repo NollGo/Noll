@@ -2,7 +2,8 @@
 <style>
   .debug {
     display: flex;
-    position: fixed;    /* absolute */
+    position: fixed;
+    /* absolute */
     font-size: 1.0rem;
     padding: 4px 12px;
     border-radius: 0.2rem;
@@ -26,6 +27,26 @@
     color: #c6c6c6;
     font-weight: bold;
     cursor: grab;
+  }
+
+  .debug .loader {
+    border: 2px solid #f3f3f3;
+    border-top: 2px solid #555;
+    border-radius: 50%;
+    width: 1.2rem;
+    height: 1.2rem;
+    display: inline-block;
+    animation: spin 2s linear infinite;
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+
+    100% {
+      transform: rotate(360deg);
+    }
   }
 </style>
 <script>
@@ -71,13 +92,18 @@
     debugButton.href = href
     debugButton.title = title
     debugButton.onclick = function () {
+      debugButton.classList.add('loader')
       fetch(href)
         .then((resp) => {
           if (resp.ok) {
             location.reload()
           } else {
             alert("Build failured")
+            debugButton.classList.remove('loader')
           }
+        }).catch((e) => {
+          alert("Build failured")
+          debugButton.classList.remove('loader')
         })
       return false
     }
