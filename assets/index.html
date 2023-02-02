@@ -3,6 +3,8 @@
 
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
+  <meta lang="zh-CN">
   <title>首页</title>
   <style>
     .THUMBS_UP::before {
@@ -43,38 +45,30 @@
   {{ if .Debug }}
   {{ template "DebugTemplate" }}
   {{ end }}
-  {{ if .Repo.Categories }}
-  <h1>分类({{ .Repo.Categories.TotalCount }})</h1>
-  <ul>
-    {{ range $i, $category := .Repo.Categories.Nodes }}
-    <li><a href="#">{{ $i }}. {{ $category.EmojiHTML }} {{ $category.Name }}</a></li>
-    {{ end }}
-  </ul>
-  {{ end }}
-  {{ if .Repo.Labels }}
-  <h1>标签({{ .Repo.Labels.TotalCount }})</h1>
-  <ul>
-    {{ range $i, $label := .Repo.Labels.Nodes }}
-    <li><a href="#">{{ $i }}. {{ $label.Name }}</a></li>
-    {{ end }}
-  </ul>
-  {{ end }}
   {{ if .Repo.Discussions }}
-  <h1>文章({{ .Repo.Discussions.TotalCount }})</h1>
-  <ul>
-    {{ range $i, $discussion := .Repo.Discussions.Nodes }}
-    <li><a href="{{ $discussion.GitHubURL }}">({{ $discussion.UpvoteCount }}) {{ $discussion.Title }}</a></li>
-    {{ if $discussion.ReactionGroups }}
-    <ul style="list-style-type: none">
-      {{ range $reaction := $discussion.ReactionGroups }}
-      {{ if gt $reaction.Reactors.TotalCount 0 }}
-      <li style="display: contents;"><span class="{{ $reaction.Content }}">{{ $reaction.Reactors.TotalCount }}</span></li>
-      {{ end }}
-      {{ end }}
-    </ul>
-    {{ end }}
-    {{ end }}
-  </ul>
+  {{ template "CategoryGroupTemplate" .Repo }}
+  <div style="display: flex;">
+    <div>
+      <h1>文章({{ .Repo.Discussions.TotalCount }})</h1>
+      <ul>
+        {{ range $i, $discussion := .Repo.Discussions.Nodes }}
+        <li><a href="p/{{ $discussion.Number }}.html">({{ $discussion.UpvoteCount }}) {{ $discussion.Title }}</a></li>
+        {{ if $discussion.ReactionGroups }}
+        <ul style="list-style-type: none">
+          {{ range $reaction := $discussion.ReactionGroups }}
+          {{ if gt $reaction.Reactors.TotalCount 0 }}
+          <li style="display: contents;"><span class="{{ $reaction.Content }}">{{ $reaction.Reactors.TotalCount
+              }}</span>
+          </li>
+          {{ end }}
+          {{ end }}
+        </ul>
+        {{ end }}
+        {{ end }}
+      </ul>
+    </div>
+    {{ template "LabelGroupTemplate" .Repo }}
+  </div>
   {{ end }}
 </body>
 

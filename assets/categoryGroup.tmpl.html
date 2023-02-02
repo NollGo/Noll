@@ -1,0 +1,13 @@
+{{define "CategoryGroupTemplate"}}
+{{ if .Categories }}
+<style>
+  .categoryGroupItem {}
+</style>
+<ul>
+  {{ range $i, $category := .Categories.Nodes }}
+  <li style="display: contents;"><a style="text-decoration: none;" href="{{ $category.Name }}">
+      {{ $category.EmojiHTML }} {{ $category.Name }}</a></li>
+  {{ end }}
+</ul>
+{{ end }}
+{{end}}
