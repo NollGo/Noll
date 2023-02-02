@@ -1,16 +1,21 @@
 package main
 
 import (
-	"fmt"
+	"html/template"
+	"net/http"
+	"os"
+	"path/filepath"
 
 	"github.com/excing/goflag"
 )
 
 // Config is gd2b config
 type Config struct {
-	Owner string `flag:"github repository owner"`
-	Name  string `flag:"github repository name"`
-	Token string `flag:"github authorization token (see https://docs.github.com/zh/graphql/guides/forming-calls-with-graphql)"`
+	Owner string `flag:"Github repository owner"`
+	Name  string `flag:"Github repository name"`
+	Token string `flag:"Github authorization token (see https://docs.github.com/zh/graphql/guides/forming-calls-with-graphql)"`
+	Pages string `flag:"Your github pages repository name, If None, defaults to the repository where the discussion resides"`
+	Debug bool   `flag:"Debug mode if true"`
 }
 
 func main() {
@@ -18,94 +23,47 @@ func main() {
 	goflag.Var(&config)
 	goflag.Parse("config", "Configuration file path.")
 
-	// 标签集合
-	lables, err := getLabels(config.Owner, config.Name, config.Token)
+	if config.Pages == "" {
+		config.Pages = config.Name
+	}
+
+	if _, err := os.Stat(config.Pages); os.IsNotExist(err) {
+		os.MkdirAll(config.Pages, os.ModePerm)
+	}
+
+	repository, err := getRepository(config.Owner, config.Name, config.Token)
 	if err != nil {
 		panic(err)
 	}
-	for _, lable := range lables.Nodes {
-		lable.Discussions = &DiscussionPage{}
-	}
 
-	// 分类集合
-	categories, err := getCategories(config.Owner, config.Name, config.Token)
-	if err != nil {
+	_render := func() error {
+		return render(repository, config.Debug, func(name string, debug bool) (*template.Template, error) {
+			return readTemplates(name, "assets", debug)
+		}, func(t *template.Template, i interface{}) error {
+			dist, err := os.Create(filepath.Join(config.Pages, t.Name()))
+			if err != nil {
+				return err
+			}
+			return t.Execute(dist, i)
+		})
+	}
+	if err = _render(); err != nil {
 		panic(err)
 	}
-	for _, category := range categories.Nodes {
-		category.Discussions = &DiscussionPage{}
-	}
 
-	// 讨论集合
-	hasNextPage := true
-	endCursor := ""
-	discussions := &DiscussionPage{}
-	for hasNextPage {
-		// 获取所有的讨论
-		discussionPage, err := getDiscussionPage(config.Owner, config.Name, config.Token, endCursor)
-		if err != nil {
-			panic(err)
-		}
-
-		for _, discussion := range discussionPage.Nodes {
-			// 获取所有的评论
-			hasNextCommentPage := true
-			endCommentCursor := ""
-			discussion.Comments = &CommentPage{}
-			for hasNextCommentPage {
-				commentPage, err := getCommentPage(config.Owner, config.Name, config.Token, discussion.Number, endCommentCursor)
-				if err != nil {
-					panic(err)
-				}
-
-				if 0 < commentPage.TotalCount {
-					discussion.Comments.Nodes = append(discussion.Comments.Nodes, commentPage.Nodes...)
-					discussion.Comments.PageInfo = commentPage.PageInfo
-					discussion.Comments.TotalCount += commentPage.TotalCount
-				}
-
-				// 是否有下一页评论
-				hasNextCommentPage = commentPage.PageInfo.HasNextPage
-				endCommentCursor = commentPage.PageInfo.EndCursor
+	if config.Debug {
+		http.Handle("/", http.StripPrefix("/", http.FileServer(http.Dir(config.Pages))))
+		// 重新编译渲染接口
+		// 调试使用
+		http.Handle("/build", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+			if err = _render(); err != nil {
+				w.WriteHeader(http.StatusInternalServerError)
+				w.Write([]byte(err.Error()))
+			} else {
+				w.WriteHeader(http.StatusOK)
+				w.Write([]byte("Build successed!"))
 			}
-
-			for _, category := range categories.Nodes {
-				if category.Name == discussion.Category.Name {
-					category.Discussions.Nodes = append(category.Discussions.Nodes, discussion)
-					category.Discussions.TotalCount++
-				}
-			}
-
-			for _, discussLabel := range discussion.Labels.Nodes {
-				for _, label := range lables.Nodes {
-					if discussLabel.Name == label.Name {
-						label.Discussions.Nodes = append(label.Discussions.Nodes, discussion)
-						label.Discussions.TotalCount++
-					}
-				}
-			}
-		}
-
-		if 0 < discussionPage.TotalCount {
-			discussions.Nodes = append(discussions.Nodes, discussionPage.Nodes...)
-			discussions.PageInfo = discussionPage.PageInfo
-			discussions.TotalCount += discussionPage.TotalCount
-		}
-
-		// 是否有下一页
-		hasNextPage = discussionPage.PageInfo.HasNextPage
-		endCursor = discussionPage.PageInfo.EndCursor
-	}
-
-	for _, label := range lables.Nodes {
-		fmt.Println(label.Name, label.Discussions.TotalCount)
-	}
-
-	for _, category := range categories.Nodes {
-		fmt.Println(category.Name, category.Discussions.TotalCount)
-	}
-
-	for _, discussion := range discussions.Nodes {
-		fmt.Println(discussion.Title, discussion.Comments.TotalCount)
+		}))
+		http.ListenAndServe(":20000", nil)
 	}
 }

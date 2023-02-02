@@ -8,6 +8,93 @@ import (
 	"strings"
 )
 
+func getRepository(owner, name, token string) (*Repository, error) {
+	// 标签集合
+	lables, err := getLabels(owner, name, token)
+	if err != nil {
+		return nil, err
+	}
+	for _, lable := range lables.Nodes {
+		lable.Discussions = &DiscussionPage{}
+	}
+
+	// 分类集合
+	categories, err := getCategories(owner, name, token)
+	if err != nil {
+		return nil, err
+	}
+	for _, category := range categories.Nodes {
+		category.Discussions = &DiscussionPage{}
+	}
+
+	// 讨论集合
+	hasNextPage := true
+	endCursor := ""
+	discussions := &DiscussionPage{}
+	for hasNextPage {
+		// 获取所有的讨论
+		discussionPage, err := getDiscussionPage(owner, name, token, endCursor)
+		if err != nil {
+			return nil, err
+		}
+
+		for _, discussion := range discussionPage.Nodes {
+			// 获取所有的评论
+			hasNextCommentPage := true
+			endCommentCursor := ""
+			discussion.Comments = &CommentPage{}
+			for hasNextCommentPage {
+				commentPage, err := getCommentPage(owner, name, token, discussion.Number, endCommentCursor)
+				if err != nil {
+					return nil, err
+				}
+
+				if 0 < commentPage.TotalCount {
+					discussion.Comments.Nodes = append(discussion.Comments.Nodes, commentPage.Nodes...)
+					discussion.Comments.PageInfo = commentPage.PageInfo
+					discussion.Comments.TotalCount += commentPage.TotalCount
+				}
+
+				// 是否有下一页评论
+				hasNextCommentPage = commentPage.PageInfo.HasNextPage
+				endCommentCursor = commentPage.PageInfo.EndCursor
+			}
+
+			for _, category := range categories.Nodes {
+				if category.Name == discussion.Category.Name {
+					category.Discussions.Nodes = append(category.Discussions.Nodes, discussion)
+					category.Discussions.TotalCount++
+				}
+			}
+
+			for _, discussLabel := range discussion.Labels.Nodes {
+				for _, label := range lables.Nodes {
+					if discussLabel.Name == label.Name {
+						label.Discussions.Nodes = append(label.Discussions.Nodes, discussion)
+						label.Discussions.TotalCount++
+					}
+				}
+			}
+		}
+
+		if 0 < discussionPage.TotalCount {
+			discussions.Nodes = append(discussions.Nodes, discussionPage.Nodes...)
+			discussions.PageInfo = discussionPage.PageInfo
+			discussions.TotalCount += discussionPage.TotalCount
+		}
+
+		// 是否有下一页
+		hasNextPage = discussionPage.PageInfo.HasNextPage
+		endCursor = discussionPage.PageInfo.EndCursor
+	}
+
+	return &Repository{
+		Labels:      lables,
+		Categories:  categories,
+		Discussions: discussions,
+	}, nil
+}
+
 func getDiscussionPage(owner, name, token string, afterCursor string) (*DiscussionPage, error) {
 	queryFormat := `{
 		repository(owner: "%v", name: "%v") {

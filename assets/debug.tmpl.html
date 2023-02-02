@@ -1,0 +1,38 @@
+{{define "DebugTemplate"}}
+<style>
+  .debug {
+    position: absolute;
+    top: 0;
+    right: 0;
+    font-size: 1.6rem;
+    text-align: right;
+    text-decoration: none;
+    width: 60px;
+    height: 60px;
+    background-image: linear-gradient(to left bottom, #1d1d1d 50%, transparent 50%);
+  }
+
+  .debug::after {
+    content: "⛏️";
+  }
+</style>
+<script>
+  window.addEventListener('DOMContentLoaded', function () {
+    let debugMenu = document.createElement("a")
+    debugMenu.classList.add('debug')
+    debugMenu.href = '/build'
+    debugMenu.onclick = function () {
+      fetch('/build')
+        .then((resp) => {
+          if (resp.ok) {
+            location.reload()
+          } else {
+            alert("Build failured")
+          }
+        })
+      return false
+    }
+    document.body.appendChild(debugMenu)
+  })
+</script>
+{{end}}

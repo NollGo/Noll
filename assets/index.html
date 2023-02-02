@@ -7,27 +7,30 @@
 </head>
 
 <body>
-  {{ if .Categories }}
-  <h1>分类({{ .Categories.TotalCount }})</h1>
+  {{ if .Debug }}
+  {{ template "DebugTemplate" }}
+  {{ end }}
+  {{ if .Repo.Categories }}
+  <h1>分类({{ .Repo.Categories.TotalCount }})</h1>
   <ul>
-    {{ range $i, $category := .Categories.Nodes }}
-    <li><a href="#">{{ $category.Name }}</a></li>
+    {{ range $i, $category := .Repo.Categories.Nodes }}
+    <li><a href="#">{{ $i }}. {{ $category.Emoji }} {{ $category.Name }}</a></li>
     {{ end }}
   </ul>
   {{ end }}
-  {{ if .Labels }}
-  <h1>标签({{ .Labels.TotalCount }})</h1>
+  {{ if .Repo.Labels }}
+  <h1>标签({{ .Repo.Labels.TotalCount }})</h1>
   <ul>
-    {{ range $i, $label := .Labels.Nodes }}
-    <li><a href="#">{{ $label.Name }}</a></li>
+    {{ range $i, $label := .Repo.Labels.Nodes }}
+    <li><a href="#">{{ $i }}. {{ $label.Name }}</a></li>
     {{ end }}
   </ul>
   {{ end }}
-  {{ if .Discussions }}
-  <h1>文章({{ .Discussions.TotalCount }})</h1>
+  {{ if .Repo.Discussions }}
+  <h1>文章({{ .Repo.Discussions.TotalCount }})</h1>
   <ul>
-    {{ range $i, $discussion := .Discussions.Nodes }}
-    <li><a href="{{ .discussion.URL }}">{{ $discussion.Name }}</a></li>
+    {{ range $i, $discussion := .Repo.Discussions.Nodes }}
+    <li><a href="{{ $discussion.GitHubURL }}">{{ $i }}. {{ $discussion.Title }}</a></li>
     {{ end }}
   </ul>
   {{ end }}

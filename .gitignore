@@ -32,7 +32,6 @@ config*.json
 test.db
 curl.sh
 screenshots/
-pubapis
 
 #本地项目测试文件，不包含 golang test
 *test.*
