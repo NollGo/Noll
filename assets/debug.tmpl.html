@@ -50,6 +50,9 @@
   }
 </style>
 <script>
+  let debugRefresh = createDebugButton('⚡', '/build', 'Refresh this page(F5)')
+  let debugIncrease = createDebugButton('⛏️', '/build?mode=increase', 'Incremental update(F6)')
+  let debugFull = createDebugButton('⚒️', '/build?mode=full', 'Full update(F7)')
   let isDebugMenuDrop = false
   window.addEventListener('DOMContentLoaded', function () {
     let debugMenu = document.createElement('div')
@@ -74,15 +77,24 @@
       debugMenu.style.top = `${e.clientY - 16}px`
     }
 
-    let debugRefresh = createDebugButton('⚡', '/build', 'Refresh this page')
-    let debugIncrease = createDebugButton('⛏️', '/build?mode=increase', 'Incremental update')
-    let debugFull = createDebugButton('⚒️', '/build?mode=full', 'Full update')
-
     debugMenu.appendChild(drop)
     debugMenu.appendChild(debugRefresh)
     debugMenu.appendChild(debugIncrease)
     debugMenu.appendChild(debugFull)
     document.body.appendChild(debugMenu)
+
+    window.addEventListener("keydown", (event) => {
+      if ("F5" == event.key) {
+        event.preventDefault()
+        debugRefresh.click()
+      } else if ("F6" == event.key) {
+        event.preventDefault()
+        debugIncrease.click()
+      } else if ("F7" == event.key) {
+        event.preventDefault()
+        debugFull.click()
+      }
+    })
   })
 
   function createDebugButton(text, href, title) {
@@ -91,20 +103,24 @@
     debugButton.innerText = text
     debugButton.href = href
     debugButton.title = title
+    let build = async function () {
+      try {
+        let resp = await fetch(href)
+        if (resp.ok) {
+          location.reload()
+        } else {
+          debugButton.classList.remove('loader')
+          let body = await resp.text()
+          throw new Error(`${resp.statusText}(${resp.status}), ${body}`)
+        }
+      } catch (e) {
+        alert(e)
+        debugButton.classList.remove('loader')
+      }
+    }
     debugButton.onclick = function () {
       debugButton.classList.add('loader')
-      fetch(href)
-        .then((resp) => {
-          if (resp.ok) {
-            location.reload()
-          } else {
-            alert("Build failured")
-            debugButton.classList.remove('loader')
-          }
-        }).catch((e) => {
-          alert("Build failured")
-          debugButton.classList.remove('loader')
-        })
+      build()
       return false
     }
     return debugButton
