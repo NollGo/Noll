@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  {{ template "HeaderTemplate"}}
+  <title>首页</title>
+</head>
+
+<body>
+  {{ if .Debug }}
+  {{ template "DebugTemplate" }}
+  {{ end }}
+  <h1> {{ .Data.Title }} </h1>
+  <div> {{ .Data.Body }} </div>
+</body>
+
+</html>

@@ -2,72 +2,19 @@
 <html>
 
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
-  <meta lang="zh-CN">
+  {{ template "HeaderTemplate"}}
   <title>首页</title>
-  <style>
-    .THUMBS_UP::before {
-      content: "👍";
-    }
-
-    .THUMBS_DOWN::before {
-      content: "👎";
-    }
-
-    .LAUGH::before {
-      content: "😄";
-    }
-
-    .HOORAY::before {
-      content: "🎉";
-    }
-
-    .CONFUSED::before {
-      content: "😕";
-    }
-
-    .HEART::before {
-      content: "❤️";
-    }
-
-    .ROCKET::before {
-      content: "🚀";
-    }
-
-    .EYES::before {
-      content: "👀";
-    }
-  </style>
 </head>
 
 <body>
   {{ if .Debug }}
   {{ template "DebugTemplate" }}
   {{ end }}
-  {{ if .Repo.Discussions }}
-  {{ template "CategoryGroupTemplate" .Repo }}
+  {{ if .Data.Discussions }}
+  {{ template "CategoryGroupTemplate" .Data }}
   <div style="display: flex;">
-    <div>
-      <h1>文章({{ .Repo.Discussions.TotalCount }})</h1>
-      <ul>
-        {{ range $i, $discussion := .Repo.Discussions.Nodes }}
-        <li><a href="p/{{ $discussion.Number }}.html">({{ $discussion.UpvoteCount }}) {{ $discussion.Title }}</a></li>
-        {{ if $discussion.ReactionGroups }}
-        <ul style="list-style-type: none">
-          {{ range $reaction := $discussion.ReactionGroups }}
-          {{ if gt $reaction.Reactors.TotalCount 0 }}
-          <li style="display: contents;"><span class="{{ $reaction.Content }}">{{ $reaction.Reactors.TotalCount
-              }}</span>
-          </li>
-          {{ end }}
-          {{ end }}
-        </ul>
-        {{ end }}
-        {{ end }}
-      </ul>
-    </div>
-    {{ template "LabelGroupTemplate" .Repo }}
+    {{ template "DiscussionGroupTemplate" .Data }}
+    {{ template "LabelGroupTemplate" .Data }}
   </div>
   {{ end }}
 </body>

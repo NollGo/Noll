@@ -43,8 +43,10 @@ func main() {
 	_render := func() error {
 		return render(repository, config.Debug, func(name string, debug bool) (*template.Template, error) {
 			return readTemplates(name, "assets", debug)
-		}, func(t *template.Template, i interface{}) error {
-			dist, err := os.Create(filepath.Join(config.Pages, t.Name()))
+		}, func(s string, t *template.Template, i interface{}) error {
+			htmlPath := filepath.Join(config.Pages, s)
+			MkdirFileFolderIfNotExists(htmlPath)
+			dist, err := os.Create(htmlPath)
 			if err != nil {
 				return err
 			}

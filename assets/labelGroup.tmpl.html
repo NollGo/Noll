@@ -4,7 +4,7 @@
   {{ if .Labels }}
   <ul>
     {{ range $i, $label := .Labels.Nodes }}
-    <li><a href="{{ $label.Name }}">{{ $label.Name }}
+    <li><a href="label/{{ $label.Name }}">{{ $label.Name }}
         {{ if $label.Discussions }}
         ({{ $label.Discussions.TotalCount }})
         {{ else }}

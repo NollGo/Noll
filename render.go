@@ -1,14 +1,21 @@
 package main
 
 import (
+	"fmt"
 	"path/filepath"
 	"text/template"
 
 	"io.github.topages/assets"
 )
 
+// RenderData 渲染模板的结构体
+type RenderData struct {
+	Debug bool
+	Data  interface{}
+}
+
 // TemplateExecute 模板渲染接口
-type TemplateExecute func(*template.Template, interface{}) error
+type TemplateExecute func(string, *template.Template, interface{}) error
 
 // TemplateReader 模板文件读取接口
 type TemplateReader func(name string, debug bool) (*template.Template, error)
@@ -54,13 +61,17 @@ func render(repo *Repository, debug bool, reader TemplateReader, execute Templat
 		return err
 	}
 
-	data := struct {
-		Repo  *Repository
-		Debug bool
-	}{
-		Repo:  repo,
-		Debug: debug,
-	}
 	indexTemplate := htmlTemplate.Lookup("index.html")
-	return execute(indexTemplate, &data)
+	if err = execute(indexTemplate.Name(), indexTemplate, &RenderData{true, &repo}); err != nil {
+		return err
+	}
+
+	postTemplate := htmlTemplate.Lookup("post.html")
+	for _, discussion := range repo.Discussions.Nodes {
+		if err = execute(fmt.Sprintf(`p/%v.html`, discussion.Number), postTemplate, &RenderData{true, &discussion}); err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

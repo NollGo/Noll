@@ -35,8 +35,8 @@ func TestRender(t *testing.T) {
 		func(name string, debug bool) (*template.Template, error) {
 			return readTemplates(name, "assets", debug)
 		},
-		func(t *template.Template, i interface{}) error {
-			fmt.Println(t.Name())
+		func(s string, t *template.Template, i interface{}) error {
+			fmt.Println(s)
 			return t.Execute(os.Stdout, i)
 		})
 	if err != nil {
