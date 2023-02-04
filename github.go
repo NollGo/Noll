@@ -16,7 +16,14 @@ func getGemoji(gemoji string) string {
 	return result[0]
 }
 
-func getRepository(owner, name, token string) (*Repository, error) {
+func getRepository(owner, name, token string) (*GithubData, error) {
+	viewer, err := getViewer(token)
+	if err != nil {
+		return nil, err
+	}
+	if viewer.Name == "" {
+		viewer.Name = viewer.Login
+	}
 	// 标签集合
 	lables, err := getLabels(owner, name, token)
 	if err != nil {
@@ -98,10 +105,13 @@ func getRepository(owner, name, token string) (*Repository, error) {
 		endCursor = discussionPage.PageInfo.EndCursor
 	}
 
-	return &Repository{
-		Labels:      lables,
-		Categories:  categories,
-		Discussions: discussions,
+	return &GithubData{
+		Viewer: viewer,
+		Repository: &Repository{
+			Labels:      lables,
+			Categories:  categories,
+			Discussions: discussions,
+		},
 	}, nil
 }
 
@@ -114,6 +124,7 @@ func getDiscussionPage(owner, name, token string, afterCursor string) (*Discussi
 					number
 					title
 					body
+					bodyHTML
 					upvoteCount
 					locked
 					createdAt
@@ -237,6 +248,26 @@ func getLabels(owner, name, token string) (*LabelPage, error) {
 		return nil, err
 	}
 	return result.Data.Repository.Labels, nil
+}
+
+func getViewer(token string) (*User, error) {
+	queryFormat := `{
+		viewer {
+			login
+			url
+			avatarUrl
+			bio
+			email
+			company
+			location
+			name
+		}
+	}`
+	var result Body
+	if err := query(queryFormat, token, &result); err != nil {
+		return nil, err
+	}
+	return result.Data.Viewer, nil
 }
 
 func query(body string, token string, result *Body) error {

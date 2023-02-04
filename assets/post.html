@@ -3,15 +3,16 @@
 
 <head>
   {{ template "HeaderTemplate"}}
-  <title>首页</title>
+  <title> {{ .Data.Discussion.Title }} - {{ .Viewer.Name }} </title>
 </head>
 
 <body>
   {{ if .Debug }}
   {{ template "DebugTemplate" }}
   {{ end }}
-  <h1> {{ .Data.Title }} </h1>
-  <div> {{ .Data.Body }} </div>
+  {{ template "CategoryGroupTemplate" .Data }}
+  <h1> {{ .Data.Discussion.Title }} </h1>
+  <div> {{ .Data.Discussion.BodyHTML }} </div>
 </body>
 
 </html>

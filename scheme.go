@@ -6,12 +6,13 @@ import (
 
 // Body is Github GraphQL api response body
 type Body struct {
-	Data *Data `json:"data"`
+	Data *GithubData `json:"data"`
 }
 
-// Data is Github GraphQL api data
-type Data struct {
+// GithubData is Github GraphQL api data
+type GithubData struct {
 	Repository *Repository `json:"repository"`
+	Viewer     *User       `json:"viewer"`
 }
 
 // PageInfo is Github GraphQL api page data info
@@ -73,6 +74,7 @@ type Discussion struct {
 	Number         int              `json:"number"`
 	Title          string           `json:"title"`
 	Body           string           `json:"body"`
+	BodyHTML       string           `json:"bodyHTML"`
 	Locked         bool             `json:"locked"`
 	UpvoteCount    int              `json:"upvoteCount"`
 	GitHubURL      string           `json:"url"`
@@ -117,6 +119,11 @@ type ReactionPage struct {
 // User is Github user scheme
 type User struct {
 	Login     string `json:"login"`
-	AvatarURL string `json:"avatarURL"`
+	AvatarURL string `json:"avatarUrl"`
 	GitHubURL string `json:"url"`
+	Bio       string `json:"bio"`
+	Email     string `json:"email"`
+	Company   string `json:"company"`
+	Location  string `json:"location"`
+	Name      string `json:"name"`
 }

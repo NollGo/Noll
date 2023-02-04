@@ -33,15 +33,15 @@ func main() {
 		os.MkdirAll(config.Pages, os.ModePerm)
 	}
 
-	var repository *Repository
+	var githubData *GithubData
 
-	_getRepository := func() error {
-		repository, err = getRepository(config.Owner, config.Name, config.Token)
+	_getGithubData := func() error {
+		githubData, err = getRepository(config.Owner, config.Name, config.Token)
 		return err
 	}
 
 	_render := func() error {
-		return render(repository, config.Debug, func(name string, debug bool) (*template.Template, error) {
+		return render(githubData, config.Debug, func(name string, debug bool) (*template.Template, error) {
 			return readTemplates(name, "assets", debug)
 		}, func(s string, t *template.Template, i interface{}) error {
 			htmlPath := filepath.Join(config.Pages, s)
@@ -53,7 +53,7 @@ func main() {
 			return t.Execute(dist, i)
 		})
 	}
-	if err = _getRepository(); err != nil {
+	if err = _getGithubData(); err != nil {
 		panic(err)
 	}
 	if err = _render(); err != nil {
@@ -83,7 +83,7 @@ func main() {
 				// 如果需要，则更新，否则跳过，此操作由渲染引擎处理。
 				//
 				// 增量更新和全量更新在流程，仅是否有删除本地所有文件的区别。
-				if err = _getRepository(); err != nil {
+				if err = _getGithubData(); err != nil {
 					w.WriteHeader(http.StatusInternalServerError)
 					w.Write([]byte(err.Error()))
 					return

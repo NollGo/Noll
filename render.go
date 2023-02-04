@@ -10,8 +10,9 @@ import (
 
 // RenderData 渲染模板的结构体
 type RenderData struct {
-	Debug bool
-	Data  interface{}
+	Debug  bool
+	Viewer *User
+	Data   interface{}
 }
 
 // TemplateExecute 模板渲染接口
@@ -55,20 +56,21 @@ func readTemplates(name, debugTemplateDir string, debug bool) (*template.Templat
 	return rootTmpl, nil
 }
 
-func render(repo *Repository, debug bool, reader TemplateReader, execute TemplateExecute) error {
+func render(data *GithubData, debug bool, reader TemplateReader, execute TemplateExecute) error {
 	htmlTemplate, err := reader("__ToPagesTemplate__", debug)
 	if err != nil {
 		return err
 	}
 
 	indexTemplate := htmlTemplate.Lookup("index.html")
-	if err = execute(indexTemplate.Name(), indexTemplate, &RenderData{true, &repo}); err != nil {
+	if err = execute(indexTemplate.Name(), indexTemplate, &RenderData{true, data.Viewer, data.Repository}); err != nil {
 		return err
 	}
 
 	postTemplate := htmlTemplate.Lookup("post.html")
-	for _, discussion := range repo.Discussions.Nodes {
-		if err = execute(fmt.Sprintf(`p/%v.html`, discussion.Number), postTemplate, &RenderData{true, &discussion}); err != nil {
+	for _, discussion := range data.Repository.Discussions.Nodes {
+		postData := &Repository{Categories: data.Repository.Categories, Discussion: discussion}
+		if err = execute(fmt.Sprintf(`p/%v.html`, discussion.Number), postTemplate, &RenderData{true, data.Viewer, postData}); err != nil {
 			return err
 		}
 	}

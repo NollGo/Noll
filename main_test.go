@@ -50,7 +50,7 @@ func TestGetEmoji4GEmoji(t *testing.T) {
 	t.Log(getGemoji(fmt.Sprintf(gemojiFormat, gemoji)) == gemoji)
 }
 
-func testRepository() *Repository {
+func testRepository() *GithubData {
 	labels := &LabelPage{}
 	labels.Nodes = append(labels.Nodes, &Label{Name: "bug"})
 	labels.TotalCount = len(labels.Nodes)
@@ -67,5 +67,8 @@ func testRepository() *Repository {
 	discussions.Nodes = append(discussions.Nodes, &Discussion{Title: "关于模板版本的一些思考", GitHubURL: "https://github.com/ThreeTenth/GitHub-Discussions-to-Blog/discussions/8"})
 	discussions.TotalCount = len(discussions.Nodes)
 
-	return &Repository{Labels: labels, Categories: categories, Discussions: discussions}
+	return &GithubData{
+		&Repository{Labels: labels, Categories: categories, Discussions: discussions},
+		&User{Login: "excing"},
+	}
 }
