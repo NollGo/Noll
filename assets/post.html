@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 
 <head>
   {{ template "HeaderTemplate"}}
-  <title> {{ .Data.Discussion.Title }} - {{ .Viewer.Name }} </title>
+  <title> {{ .Data.Discussion.Title }}' </title>
 </head>
 
 <body>
@@ -13,6 +13,29 @@
   {{ template "CategoryGroupTemplate" .Data }}
   <h1> {{ .Data.Discussion.Title }} </h1>
   <div> {{ .Data.Discussion.BodyHTML }} </div>
+  <div style="display: flex;">
+    <label>{{ .Data.Discussion.Category.Name }}</label>
+    <time>{{ .Data.Discussion.CreatedAt }}</time>
+  </div>
+  {{ if .Data.Discussion.Labels }}
+  <div>
+    {{ range $label := .Data.Discussion.Labels.Nodes }}
+    <span style='color: #{{$label.Color}};'>#{{ $label.Name }}</span>
+    {{ end }}
+  </div>
+  {{ end }}
+  {{ if .Data.Discussion.Comments }}
+  <div>
+    {{ range $comment := .Data.Discussion.Comments.Nodes }}
+    <p>
+      {{ $comment.Body }}
+    </p>
+    {{ end }}
+  </div>
+  {{ end }}
+  <div>
+
+  </div>
 </body>
 
 </html>

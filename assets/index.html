@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html>
+<html lang="zh-CN">
 
 <head>
   {{ template "HeaderTemplate"}}
-  <title>首页</title>
+  <title>{{ .Viewer.Name }} 的博客 </title>
 </head>
 
 <body>
@@ -12,9 +12,13 @@
   {{ end }}
   {{ if .Data.Discussions }}
   {{ template "CategoryGroupTemplate" .Data }}
-  <div style="display: flex;">
-    {{ template "DiscussionGroupTemplate" .Data }}
-    {{ template "LabelGroupTemplate" .Data }}
+  <div class="column">
+    <div class="flex-fill">
+      {{ template "DiscussionGroupTemplate" .Data }}
+    </div>
+    <div>
+      {{ template "LabelGroupTemplate" .Data }}
+    </div>
   </div>
   {{ end }}
 </body>
