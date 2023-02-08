@@ -1,7 +1,7 @@
 {{define "DiscussionGroupTemplate"}}
-<h1>文章({{ .Discussions.TotalCount }})</h1>
+<h1>文章({{ .Data.TotalCount }})</h1>
 <ul>
-  {{ range $i, $discussion := .Discussions.Nodes }}
+  {{ range $i, $discussion := .Data.Nodes }}
   <li><a href="p/{{ $discussion.Number }}.html">{{ $discussion.Title }}
       ({{ $discussion.Comments.TotalCount }})
     </a></li>

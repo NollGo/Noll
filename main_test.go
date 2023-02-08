@@ -33,7 +33,7 @@ func TestRender(t *testing.T) {
 		testRepository(),
 		true,
 		func(name string, debug bool) (*template.Template, error) {
-			return readTemplates(name, "assets", debug)
+			return readTemplates(name, "assets/theme", debug)
 		},
 		func(s string, t *template.Template, i interface{}) error {
 			fmt.Println(s)
@@ -64,7 +64,7 @@ func testRepository() *GithubData {
 	categories.TotalCount = len(categories.Nodes)
 
 	discussions := &DiscussionPage{}
-	discussions.Nodes = append(discussions.Nodes, &Discussion{Title: "关于模板版本的一些思考", GitHubURL: "https://github.com/ThreeTenth/GitHub-Discussions-to-Blog/discussions/8"})
+	discussions.Nodes = append(discussions.Nodes, &Discussion{Title: "关于模板版本的一些思考", GitHubURL: "https://github.com/ThreeTenth/GitHub-Discussions-to-Blog/discussions/8", Category: &Category{Name: "Ideas"}, Comments: &CommentPage{}})
 	discussions.TotalCount = len(discussions.Nodes)
 
 	return &GithubData{

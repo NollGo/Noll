@@ -5,6 +5,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 	"text/template"
 
 	"github.com/excing/goflag"
@@ -42,14 +43,16 @@ func main() {
 
 	_render := func() error {
 		return render(githubData, config.Debug, func(name string, debug bool) (*template.Template, error) {
-			return readTemplates(name, "assets", debug)
+			return readTemplates(name, "assets/theme", debug)
 		}, func(s string, t *template.Template, i interface{}) error {
-			htmlPath := filepath.Join(config.Pages, s)
+			fname := strings.ReplaceAll(s, ".gtpl", ".html")
+			htmlPath := filepath.Join(config.Pages, fname)
 			MkdirFileFolderIfNotExists(htmlPath)
 			dist, err := os.Create(htmlPath)
 			if err != nil {
 				return err
 			}
+			defer dist.Close()
 			return t.Execute(dist, i)
 		})
 	}

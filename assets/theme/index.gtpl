@@ -3,21 +3,21 @@
 
 <head>
   {{ template "HeaderTemplate"}}
-  <title>{{ .Viewer.Name }} 的博客 </title>
+  <title>{{ .Viewer.Name }}'s Blog </title>
 </head>
 
 <body>
   {{ if .Debug }}
   {{ template "DebugTemplate" }}
   {{ end }}
-  {{ if .Data.Discussions }}
-  {{ template "CategoryGroupTemplate" .Data }}
+  {{ if .Data }}
+  {{ template "CategoryGroupTemplate" . }}
   <div class="column">
     <div class="flex-fill">
-      {{ template "DiscussionGroupTemplate" .Data }}
+      {{ template "DiscussionGroupTemplate" . }}
     </div>
     <div>
-      {{ template "LabelGroupTemplate" .Data }}
+      {{ template "LabelGroupTemplate" . }}
     </div>
   </div>
   {{ end }}
