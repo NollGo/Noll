@@ -7,9 +7,6 @@
 </head>
 
 <body>
-  {{ if .Debug }}
-  {{ template "DebugTemplate" }}
-  {{ end }}
   {{ if .Data }}
   {{ template "CategoryGroupTemplate" . }}
   <div class="column">

@@ -2,7 +2,7 @@
 <h1>文章({{ .Data.TotalCount }})</h1>
 <ul>
   {{ range $i, $discussion := .Data.Nodes }}
-  <li><a href="p/{{ $discussion.Number }}.html">{{ $discussion.Title }}
+  <li><a href="post/{{ $discussion.Number }}.html">{{ $discussion.Title }}
       ({{ $discussion.Comments.TotalCount }})
     </a></li>
   {{ if $discussion.ReactionGroups }}

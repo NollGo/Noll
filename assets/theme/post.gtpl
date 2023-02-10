@@ -7,9 +7,6 @@
 </head>
 
 <body>
-  {{ if .Debug }}
-  {{ template "DebugTemplate" }}
-  {{ end }}
   {{ template "CategoryGroupTemplate" . }}
   <h1> {{ .Data.Title }} </h1>
   <time>{{ .Data.CreatedAt }}</time>
