@@ -6,7 +6,6 @@ import (
 	"os"
 	"path/filepath"
 	"strings"
-	"text/template"
 
 	"github.com/excing/goflag"
 )
@@ -42,18 +41,12 @@ func main() {
 	}
 
 	_render := func() error {
-		return render(githubData, config.Debug, func(name string, debug bool) (*template.Template, error) {
-			return readTemplates(name, "assets/theme", debug)
-		}, func(s string, t *template.Template, i interface{}) error {
+		return render(githubData, "assets/theme", config.Debug, func(s string, b []byte) error {
 			fname := strings.ReplaceAll(s, ".gtpl", ".html")
 			htmlPath := filepath.Join(config.Pages, fname)
 			MkdirFileFolderIfNotExists(htmlPath)
-			dist, err := os.Create(htmlPath)
-			if err != nil {
-				return err
-			}
-			defer dist.Close()
-			return t.Execute(dist, i)
+			fmt.Println(s, string(b), "\n=========================================")
+			return os.WriteFile(htmlPath, b, 0666)
 		})
 	}
 	if err = _getGithubData(); err != nil {
@@ -66,7 +59,8 @@ func main() {
 	fmt.Println("Start toPages package finished")
 
 	if config.Debug {
-		fmt.Println("Start toPages debug mode")
+		port := ":20000"
+		fmt.Println("Start toPages debug mode in port", port)
 		http.Handle("/", http.StripPrefix("/", http.FileServer(http.Dir(config.Pages))))
 		// 重新编译渲染接口
 		// 调试使用
@@ -100,6 +94,6 @@ func main() {
 				w.Write([]byte("Build successed!"))
 			}
 		}))
-		http.ListenAndServe(":20000", nil)
+		http.ListenAndServe(port, nil)
 	}
 }

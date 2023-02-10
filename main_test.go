@@ -3,8 +3,8 @@ package main
 import (
 	"fmt"
 	"os"
+	"strings"
 	"testing"
-	"text/template"
 )
 
 func TestQueryf(t *testing.T) {
@@ -31,16 +31,24 @@ func TestQueryf(t *testing.T) {
 func TestRender(t *testing.T) {
 	err := render(
 		testRepository(),
+		"assets/theme",
 		true,
-		func(name string, debug bool) (*template.Template, error) {
-			return readTemplates(name, "assets/theme", debug)
-		},
-		func(s string, t *template.Template, i interface{}) error {
+		func(s string, b []byte) error {
 			fmt.Println(s)
-			return t.Execute(os.Stdout, i)
-		})
+			_, err := os.Stdout.Write(b)
+			return err
+		},
+	)
 	if err != nil {
 		t.Fatal(err)
+	}
+}
+
+func TestOsStat(t *testing.T) {
+	if _, err := os.Stat(""); os.IsNotExist(err) {
+		t.Fatal(err)
+	} else {
+		t.Log("PASS")
 	}
 }
 
@@ -48,6 +56,12 @@ func TestGetEmoji4GEmoji(t *testing.T) {
 	gemojiFormat := `<div></div>`
 	gemoji := `<g-emoji class="g-emoji" alias="mega" fallback-src="https://github.githubassets.com/images/icons/emoji/unicode/1f4e3.png">📣</g-emoji>`
 	t.Log(getGemoji(fmt.Sprintf(gemojiFormat, gemoji)) == gemoji)
+}
+
+func TestPref(t *testing.T) {
+	str := "example.txt"
+	suffix := "txt"
+	t.Log(strings.HasSuffix(str, suffix))
 }
 
 func testRepository() *GithubData {

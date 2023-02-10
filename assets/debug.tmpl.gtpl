@@ -1,4 +1,3 @@
-{{define "DebugTemplate"}}
 <style>
   .debug {
     display: flex;
@@ -127,4 +126,3 @@
     return debugButton
   }
 </script>
-{{end}}
