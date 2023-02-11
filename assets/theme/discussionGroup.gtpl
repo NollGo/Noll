@@ -8,7 +8,7 @@
           {{ $discussion.Comments.TotalCount }}</span></li>
       {{ if $discussion.ReactionGroups }}
       {{ range $reaction := $discussion.ReactionGroups }}
-      {{ if gt $reaction.Reactors.TotalCount 0 }}
+      {{ if $reaction.Reactors.TotalCount }}
       <li class="li"><span class="{{ $reaction.Content }}">
           {{ $reaction.Reactors.TotalCount }}</span>
       </li>
