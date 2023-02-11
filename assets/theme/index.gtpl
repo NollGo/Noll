@@ -21,6 +21,7 @@
     </div>
   </div>
   {{ end }}
+  {{ template "footerTemplate" .Viewer }}
 </body>
 
 </html>

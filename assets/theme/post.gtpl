@@ -38,6 +38,7 @@
     </div>
     {{ end }}
   </article>
+  {{ template "footerTemplate" .Viewer }}
 </body>
 
 </html>

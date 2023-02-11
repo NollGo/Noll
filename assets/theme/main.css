@@ -10,6 +10,17 @@ body {
   word-spacing: 0.1rem;
 }
 
+footer {
+  text-align: center;
+  font-size : 1rem;
+  color     : #bcbcbc;
+  margin    : 40px auto 10px auto;
+}
+
+footer a {
+  color: #666;
+}
+
 ul.ul {
   padding: 0px;
 }
