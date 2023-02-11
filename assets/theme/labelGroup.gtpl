@@ -1,9 +1,9 @@
 {{define "LabelGroupTemplate"}}
 <h1>标签({{ .Labels.TotalCount }})</h1>
 {{ if .Labels }}
-<ul class="ul">
+<ul class="ul" style="margin-left: -10px;">
   {{ range $i, $label := .Labels.Nodes }}
-  <li class="li"><a href="label/{{ $label.Name }}">
+  <li class="li"><a href="label/{{ $label.Name }}.html">
       {{ template "LabelTemplate" $label }}
       {{ if $label.Discussions }}
       ({{ $label.Discussions.TotalCount }})
