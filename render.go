@@ -123,12 +123,6 @@ func render(data *GithubData, themeTmplDir string, debug bool, writer WriterFunc
 	}
 	htmlPages[indexTemplate.Name()] = stringWriter.String()
 
-	archiveTemplate := themeTemplate.Lookup("archive.gtpl")
-	if err = archiveTemplate.Execute(stringWriter.Reset(), _data); err != nil {
-		return err
-	}
-	htmlPages[archiveTemplate.Name()] = stringWriter.String()
-
 	categoriesTemplate := themeTemplate.Lookup("categories.gtpl")
 	if err = categoriesTemplate.Execute(stringWriter.Reset(), _data); err != nil {
 		return err
@@ -172,6 +166,30 @@ func render(data *GithubData, themeTmplDir string, debug bool, writer WriterFunc
 			return err
 		}
 		htmlPages[fmt.Sprintf(`post/%v.gtpl`, discussion.Number)] = stringWriter.String()
+	}
+
+	archiveTemplate := themeTemplate.Lookup("archive.gtpl")
+	totalCount := data.Repository.Discussions.TotalCount
+	pageIndex := 1 // 编号从 1 开始
+	pageSize := 30
+	pageCount := totalCount / pageSize
+	if totalCount%pageSize > 0 {
+		pageCount++
+	}
+	for start := 0; start < totalCount; {
+		end := start + pageSize
+		if end > totalCount {
+			end = totalCount
+		}
+		nodes := data.Repository.Discussions.Nodes[start:end]
+		_pageInfo := &PageInfo{end < totalCount, fmt.Sprintf("%v", pageIndex+1), 0 < start, fmt.Sprintf("%v", pageIndex-1)}
+		_data.Data = &DiscussionPage{end - start, nodes, _pageInfo}
+		if err = archiveTemplate.Execute(stringWriter.Reset(), _data); err != nil {
+			return err
+		}
+		htmlPages[fmt.Sprintf("archive/%v.gtpl", pageIndex)] = stringWriter.String()
+		pageIndex++
+		start = end
 	}
 
 	// 5. 全局渲染，比如调试模式

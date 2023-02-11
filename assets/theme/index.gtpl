@@ -13,12 +13,7 @@
   <div class="column">
     <div class="flex-fill">
       <h1>近期文章</h1>
-      {{ template "DiscussionGroupTemplate" .Data }}
-      <div>
-        <div style="display: block; margin: 1em -10px;">
-          <a href="/archive.html">更多文章……</a>
-        </div>
-      </div>
+      {{ template "DiscussionGroup2Template" .Data }}
     </div>
     <div>
       <h1>标签 ({{ .Labels.TotalCount }})</h1>

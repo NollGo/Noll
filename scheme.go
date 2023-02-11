@@ -19,6 +19,8 @@ type GithubData struct {
 type PageInfo struct {
 	HasNextPage bool   `json:"hasNextPage"`
 	EndCursor   string `json:"endCursor"`
+	HasPrevPage bool   `json:"-"`
+	StartCursor string `json:"-"`
 }
 
 // Repository is Github repository scheme
