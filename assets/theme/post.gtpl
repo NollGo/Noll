@@ -2,7 +2,7 @@
 <html lang="zh-CN">
 
 <head>
-  {{ template "HeadTemplate"}}
+  {{ template "HeadTemplate" .Viewer }}
   <title> {{ .Data.Title }}</title>
 </head>
 
