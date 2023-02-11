@@ -5,7 +5,7 @@
   {{ if ism $time $discussion.CreatedAt }}
   {{ else }}
   <a><time style="color: #c6c6c6;">
-      <h3 style="margin: 0.5em 0 0.3em 0;">{{ $discussion.CreatedAt.Month }} {{ $discussion.CreatedAt.Year }}</h3>
+      <h3 style="margin: 0.5em 0 0.3em 0;">{{ $discussion.CreatedAt.Format "01 / 2006" }}</h3>
     </time></a>
   {{ $time = $discussion.CreatedAt }}
   {{ end }}
