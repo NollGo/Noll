@@ -1,7 +1,7 @@
 {{define "DiscussionGroupTemplate"}}
 <ul class="ul" style="margin-left: -10px;">
   {{ range $i, $discussion := .Nodes }}
-  <li style="display: block; margin: 5px 0;"><a href="post/{{ $discussion.Number }}.html">{{ $discussion.Title }}
+  <li style="display: block; margin: 5px 0;"><a href="/post/{{ $discussion.Number }}.html">{{ $discussion.Title }}
     </a>
     <ul style="display: contents;">
       <li class="li"><span class="COMMENT">

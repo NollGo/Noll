@@ -3,7 +3,7 @@
 
 <head>
   {{ template "HeadTemplate"}}
-  <title> {{ .Data.Title }}' </title>
+  <title> {{ .Data.Title }}</title>
 </head>
 
 <body>
