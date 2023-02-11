@@ -12,10 +12,12 @@
   {{ template "CategoryGroupTemplate" . }}
   <div class="column">
     <div class="flex-fill">
-      {{ template "DiscussionGroupTemplate" . }}
+      <h1>近期文章</h1>
+      {{ template "DiscussionGroupTemplate" .Data }}
     </div>
     <div>
-      {{ template "LabelGroupTemplate" . }}
+      <h1>标签 ({{ .Labels.TotalCount }})</h1>
+      {{ template "LabelGroupTemplate" .Labels }}
     </div>
   </div>
   {{ end }}
