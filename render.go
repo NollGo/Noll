@@ -156,12 +156,12 @@ func render(data *GithubData, themeTmplDir string, debug bool, writer WriterFunc
 	htmlPages[aboutTemplate.Name()] = stringWriter.String()
 
 	categoryTemplate := themeTemplate.Lookup("category.gtpl")
-	for i, category := range data.Repository.Categories.Nodes {
+	for _, category := range data.Repository.Categories.Nodes {
 		_data.Data = category
 		if err = categoryTemplate.Execute(stringWriter.Reset(), _data); err != nil {
 			return err
 		}
-		htmlPages[fmt.Sprintf(`category/%v.gtpl`, i+1)] = stringWriter.String()
+		htmlPages[fmt.Sprintf(`category/%v.gtpl`, category.Name)] = stringWriter.String()
 	}
 
 	labelTemplate := themeTemplate.Lookup("label.gtpl")
