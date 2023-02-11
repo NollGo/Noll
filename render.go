@@ -7,6 +7,7 @@ import (
 	"path/filepath"
 	"strings"
 	"text/template"
+	"time"
 
 	"io.github.topages/assets"
 )
@@ -98,7 +99,20 @@ func render(data *GithubData, themeTmplDir string, debug bool, writer WriterFunc
 	}
 
 	// 2. 获取主题模板
-	themeTemplate, err := readTemplates(template.New("__ToPagesTemplate__"), r, ".")
+	templateFuncMap := template.FuncMap{
+		"time": func() time.Time { return time.Time{} },
+		"isd": func(d1, d2 time.Time) bool {
+			return d1.Year() == d2.Year() && d1.YearDay() == d2.YearDay()
+		},
+		"ism": func(d1, d2 time.Time) bool {
+			return d1.Year() == d2.Year() && d1.Month() == d2.Month()
+		},
+		"isy": func(d1, d2 time.Time) bool {
+			return d1.Year() == d2.Year()
+		},
+	}
+	themeTemplate, err := readTemplates(
+		template.New("__ToPagesTemplate__").Funcs(templateFuncMap), r, ".")
 	if err != nil {
 		return err
 	}

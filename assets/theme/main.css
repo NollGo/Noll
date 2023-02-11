@@ -28,11 +28,11 @@ a {
   display         : inline-block;
 }
 
-a:hover {
+a[href]:hover {
   background-color: #eee;
 }
 
-a:active {
+a[href]:active {
   background-color: #ddd;
 }
 

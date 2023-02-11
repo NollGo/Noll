@@ -5,7 +5,18 @@ import (
 	"os"
 	"strings"
 	"testing"
+	"time"
 )
+
+func TestTimeConvert(t *testing.T) {
+	timeStr := ""
+	time, err := time.Parse("2006-01-02 15:04:05", timeStr)
+	if err != nil {
+		// Result: failed
+		t.Fatal(err)
+	}
+	t.Log(time.String())
+}
 
 func TestQueryf(t *testing.T) {
 	query := queryf(`{
@@ -66,15 +77,15 @@ func TestPref(t *testing.T) {
 
 func testRepository() *GithubData {
 	labels := &LabelPage{}
-	labels.Nodes = append(labels.Nodes, &Label{Name: "bug"})
+	labels.Nodes = append(labels.Nodes, &Label{Name: "bug", Discussions: &DiscussionPage{}})
 	labels.TotalCount = len(labels.Nodes)
 
 	categories := &CategoryPage{}
-	categories.Nodes = append(categories.Nodes, &Category{Name: "Announcements"})
-	categories.Nodes = append(categories.Nodes, &Category{Name: "General"})
-	categories.Nodes = append(categories.Nodes, &Category{Name: "Ideas"})
-	categories.Nodes = append(categories.Nodes, &Category{Name: "Polls"})
-	categories.Nodes = append(categories.Nodes, &Category{Name: "Q&A"})
+	categories.Nodes = append(categories.Nodes, &Category{Name: "Announcements", Discussions: &DiscussionPage{}})
+	categories.Nodes = append(categories.Nodes, &Category{Name: "General", Discussions: &DiscussionPage{}})
+	categories.Nodes = append(categories.Nodes, &Category{Name: "Ideas", Discussions: &DiscussionPage{}})
+	categories.Nodes = append(categories.Nodes, &Category{Name: "Polls", Discussions: &DiscussionPage{}})
+	categories.Nodes = append(categories.Nodes, &Category{Name: "Q&A", Discussions: &DiscussionPage{}})
 	categories.TotalCount = len(categories.Nodes)
 
 	discussions := &DiscussionPage{}
