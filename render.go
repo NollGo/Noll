@@ -27,6 +27,12 @@ type StringWriter struct {
 	Data []byte
 }
 
+// Reset 重置资源
+func (w *StringWriter) Reset() *StringWriter {
+	w.Data = make([]byte, 0)
+	return w
+}
+
 // Write 向字符串中写入
 func (w *StringWriter) Write(p []byte) (n int, err error) {
 	w.Data = append(w.Data, p...)
@@ -112,31 +118,31 @@ func render(data *GithubData, themeTmplDir string, debug bool, writer WriterFunc
 		Categories: data.Repository.Categories,
 	}
 	_data.Data = data.Repository.Discussions
-	if err = indexTemplate.Execute(stringWriter, _data); err != nil {
+	if err = indexTemplate.Execute(stringWriter.Reset(), _data); err != nil {
 		return err
 	}
 	htmlPages[indexTemplate.Name()] = stringWriter.String()
 
 	archiveTemplate := themeTemplate.Lookup("archive.gtpl")
-	if err = archiveTemplate.Execute(stringWriter, _data); err != nil {
+	if err = archiveTemplate.Execute(stringWriter.Reset(), _data); err != nil {
 		return err
 	}
 	htmlPages[archiveTemplate.Name()] = stringWriter.String()
 
 	categoriesTemplate := themeTemplate.Lookup("categories.gtpl")
-	if err = categoriesTemplate.Execute(stringWriter, _data); err != nil {
+	if err = categoriesTemplate.Execute(stringWriter.Reset(), _data); err != nil {
 		return err
 	}
 	htmlPages[categoriesTemplate.Name()] = stringWriter.String()
 
 	labelsTemplate := themeTemplate.Lookup("labels.gtpl")
-	if err = labelsTemplate.Execute(stringWriter, _data); err != nil {
+	if err = labelsTemplate.Execute(stringWriter.Reset(), _data); err != nil {
 		return err
 	}
 	htmlPages[labelsTemplate.Name()] = stringWriter.String()
 
 	aboutTemplate := themeTemplate.Lookup("about.gtpl")
-	if err = aboutTemplate.Execute(stringWriter, _data); err != nil {
+	if err = aboutTemplate.Execute(stringWriter.Reset(), _data); err != nil {
 		return err
 	}
 	htmlPages[aboutTemplate.Name()] = stringWriter.String()
@@ -144,7 +150,7 @@ func render(data *GithubData, themeTmplDir string, debug bool, writer WriterFunc
 	categoryTemplate := themeTemplate.Lookup("category.gtpl")
 	for i, category := range data.Repository.Categories.Nodes {
 		_data.Data = category
-		if err = categoryTemplate.Execute(stringWriter, _data); err != nil {
+		if err = categoryTemplate.Execute(stringWriter.Reset(), _data); err != nil {
 			return err
 		}
 		htmlPages[fmt.Sprintf(`category/%v.gtpl`, i+1)] = stringWriter.String()
@@ -153,7 +159,7 @@ func render(data *GithubData, themeTmplDir string, debug bool, writer WriterFunc
 	labelTemplate := themeTemplate.Lookup("label.gtpl")
 	for i, label := range data.Repository.Labels.Nodes {
 		_data.Data = label
-		if err = labelTemplate.Execute(stringWriter, _data); err != nil {
+		if err = labelTemplate.Execute(stringWriter.Reset(), _data); err != nil {
 			return err
 		}
 		htmlPages[fmt.Sprintf(`label/%v.gtpl`, i+1)] = stringWriter.String()
@@ -162,7 +168,7 @@ func render(data *GithubData, themeTmplDir string, debug bool, writer WriterFunc
 	postTemplate := themeTemplate.Lookup("post.gtpl")
 	for _, discussion := range data.Repository.Discussions.Nodes {
 		_data.Data = discussion
-		if err = postTemplate.Execute(stringWriter, _data); err != nil {
+		if err = postTemplate.Execute(stringWriter.Reset(), _data); err != nil {
 			return err
 		}
 		htmlPages[fmt.Sprintf(`post/%v.gtpl`, discussion.Number)] = stringWriter.String()
