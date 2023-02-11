@@ -2,12 +2,13 @@
 <html lang="zh-CN">
 
 <head>
-  {{ template "HeaderTemplate"}}
+  {{ template "HeadTemplate"}}
   <title>{{ .Viewer.Name }}'s Blog </title>
 </head>
 
 <body>
   {{ if .Data }}
+  {{ template "HeaderTemplate" . }}
   {{ template "CategoryGroupTemplate" . }}
   <div class="column">
     <div class="flex-fill">

@@ -1,9 +1,10 @@
 {{define "LabelGroupTemplate"}}
 <h1>标签({{ .Labels.TotalCount }})</h1>
 {{ if .Labels }}
-<ul>
+<ul class="ul">
   {{ range $i, $label := .Labels.Nodes }}
-  <li><a href="label/{{ $label.Name }}">{{ $label.Name }}
+  <li class="li"><a href="label/{{ $label.Name }}">
+      {{ template "LabelTemplate" $label }}
       {{ if $label.Discussions }}
       ({{ $label.Discussions.TotalCount }})
       {{ else }}

@@ -1,6 +1,13 @@
 {{define "HeaderTemplate"}}
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, minimal-ui">
-<meta lang="zh-CN">
-<link crossorigin="anonymous" media="all" rel="stylesheet" href="/main.css" />
+<ul class="ul">
+  <li class="li"><a href="/">
+      <h4 style="display: contents;">🏠 首页</h4>
+    </a></li>
+  <li class="li"><a href="about.html">
+      <h4 style="display: contents;">🗂️ 归档</h4>
+    </a></li>
+  <li class="li"><a href="about.html">
+      <h4 style="display: contents;">👉 About</h4>
+    </a></li>
+</ul>
 {{end}}

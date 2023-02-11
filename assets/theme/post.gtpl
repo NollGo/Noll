@@ -2,12 +2,17 @@
 <html lang="zh-CN">
 
 <head>
-  {{ template "HeaderTemplate"}}
+  {{ template "HeadTemplate"}}
   <title> {{ .Data.Title }}' </title>
 </head>
 
 <body>
-  {{ template "CategoryGroupTemplate" . }}
+  <style>
+    .markdown p {
+      margin: 0.8rem auto;
+    }
+  </style>
+  {{ template "HeaderTemplate" . }}
   <h1> {{ .Data.Title }} </h1>
   <time>{{ .Data.CreatedAt }}</time>
   <article class="markdown">

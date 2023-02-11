@@ -7,12 +7,38 @@ body {
   margin      : auto;
   padding     : 8px;
   font-size   : 1.2rem;
-  word-spacing: 0.2rem;
+  word-spacing: 0.1rem;
   line-height : 2rem;
 }
 
-p {
-  margin: 0.8rem auto;
+ul.ul {
+  padding: 0px;
+}
+
+ul.ul li.li {
+  display: inline-block;
+}
+
+a {
+  color           : #333;
+  text-decoration : none;
+  transition      : all 0.2s ease-in-out;
+  background-color: transparent;
+  border-radius   : 5px;
+  padding         : 5px 10px;
+  display         : inline-block;
+}
+
+a:hover {
+  background-color: #eee;
+}
+
+a:active {
+  background-color: #ddd;
+}
+
+.margin-right-5px-without-last:not(:last-of-type) {
+  margin-right: 5px;
 }
 
 .column {
