@@ -9,7 +9,7 @@
 <body>
   {{ if .Data }}
   {{ template "HeaderTemplate" . }}
-  <div>
+  <div class="clearfix">
     <h1>归档</h1>
     {{ template "DiscussionGroupTemplate" .Data }}
     <ul class="ul" style="margin-left: -10px;">

@@ -8,6 +8,7 @@
 
 <body>
   {{ template "HeaderTemplate" . }}
+  <div class="clearfix"></div>
   <h1>About {{ .Viewer.Name }}</h1>
   {{ if .Viewer.Bio }}
   <p>{{ .Viewer.Bio }}</p>

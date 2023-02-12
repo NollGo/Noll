@@ -7,12 +7,8 @@
 </head>
 
 <body>
-  <style>
-    .markdown p {
-      margin: 0.8rem auto;
-    }
-  </style>
   {{ template "HeaderTemplate" . }}
+  <div class="clearfix"></div>
   <h1> {{ .Data.Title }} </h1>
   <time>{{ .Data.CreatedAt }}</time>
   <article class="markdown">

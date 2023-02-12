@@ -9,7 +9,6 @@
 <body>
   {{ if .Data }}
   {{ template "HeaderTemplate" . }}
-  {{ template "CategoryGroupTemplate" . }}
   <div class="column">
     <div class="flex-fill">
       <h1>近期文章</h1>
@@ -19,6 +18,10 @@
           <a href="/archive/1.html">更多文章 >>></a>
         </li>
       </ul>
+    </div>
+    <div>
+      <h1>分类</h1>
+      {{ template "CategoryGroupTemplate" .Categories }}
     </div>
     <div>
       <h1>标签</h1>
