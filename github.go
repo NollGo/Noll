@@ -183,6 +183,7 @@ func getCommentPage(owner, name, token string, discussionNumber int, afterCursor
 						authorAssociation
 						updatedAt
 						upvoteCount
+						url
 						reactionGroups {
 							content
 							reactors(first: 1) {

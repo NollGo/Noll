@@ -101,6 +101,7 @@ type Comment struct {
 	Body              string           `json:"body"`
 	BodyHTML          string           `json:"bodyHTML"`
 	UpvoteCount       int              `json:"upvoteCount"`
+	GitHubURL         string           `json:"url"`
 	AuthorAssociation string           `json:"authorAssociation"`
 	CreatedAt         time.Time        `json:"createdAt"`
 	UpdatedAt         time.Time        `json:"updatedAt"`
