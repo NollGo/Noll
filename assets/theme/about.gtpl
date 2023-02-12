@@ -14,6 +14,7 @@
   <p>🌍 {{ .Viewer.Location }}</p>
   <p>📧 {{ .Viewer.Email }}</p>
   <p>😺 <a style="padding: 0px;" href="{{ .Viewer.GitHubURL }}">{{ .Viewer.GitHubURL }}</a></p>
+  <p>🕊️ <a style="padding: 0px;" href="https://twitter.com/{{ .Viewer.Twitter }}">https://twitter.com/{{ .Viewer.Twitter }}</a></p>
   <!-- style="white-space: pre-wrap;" -->
   {{ template "footerTemplate" .Viewer }}
 </body>

@@ -261,6 +261,7 @@ func getViewer(token string) (*User, error) {
 			company
 			location
 			name
+			twitterUsername
 		}
 	}`
 	var result Body

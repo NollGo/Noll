@@ -128,4 +128,5 @@ type User struct {
 	Company   string `json:"company"`
 	Location  string `json:"location"`
 	Name      string `json:"name"`
+	Twitter   string `json:"twitterUsername"`
 }
