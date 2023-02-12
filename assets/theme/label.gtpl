@@ -6,7 +6,7 @@
   <title>{{ .Data.Name }} Label —— {{ .Viewer.Name }}'s Blog </title>
 </head>
 
-<body>
+<body {{ template "ColorStyleTemplate" .Data.Color }}>
   {{ template "HeaderTemplate" . }}
   <div>
     <h1> {{ .Data.Name }} </h1>
