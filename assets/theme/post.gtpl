@@ -11,12 +11,28 @@
       line-height: 1.4;
     }
 
+    .markdown:first-of-type {
+      margin-top: 40px;
+    }
+
     .reaction+.reaction {
       margin-left: 0;
     }
 
     .reaction a {
       border-radius: 100px;
+    }
+
+    .comment {
+      width: 100%;
+    }
+
+    .comment-input {
+      text-align: center;
+      border: 1px solid #ddd;
+      background-color: #f9f9f9;
+      min-width: 100%;
+      padding: 30px 0;
     }
   </style>
 </head>
@@ -34,42 +50,49 @@
     </div>
   </div>
   <article class="markdown">
-    <div> {{ .Data.BodyHTML }} </div>
-    {{ if .Data.ReactionGroups }}
-    <ul class="ul" style="text-align: center; margin: 30px auto;">
-      <li class="li reaction">
-        <a href="{{ $githubURL }}"><span class="SMILING"></span></a>
-      </li>
-      {{ range $reaction := .Data.ReactionGroups }}
-      {{ if $reaction.Reactors.TotalCount }}
-      <li class="li reaction">
-        <a href="{{ $githubURL }}"><span class="{{ $reaction.Content }}">
-            {{ $reaction.Reactors.TotalCount }}</span></a>
-      </li>
-      {{ end }}
-      {{ end }}
-    </ul>
-    {{ else }}
-    {{ end }}
-    <ul class="ul" style="margin-left: -10px;">
-      <li class="li">{{ template "CategoryItemTemplate" .Data.Category }}</li>
-      {{ if .Data.Labels }}
-      {{ range $i, $label := .Data.Labels.Nodes }}
-      <li class="li">{{ template "LabelItemTemplate" $label }}</li>
-      {{ end }}
-      {{ end }}
-    </ul>
-    {{ if .Data.Comments }}
-    <h4>去评论</h4>
-    <ul class="ul">
-      {{ range $comment := .Data.Comments.Nodes }}
-      <li class="li">
-        {{ template "CommentItemTemplate" $comment }}
-      </li>
-      {{ end }}
-      </div>
-      {{ end }}
+    {{ .Data.BodyHTML }}
   </article>
+  <ul class="ul" style="margin: 30px -10px;">
+    <li class="li">{{ template "CategoryItemTemplate" .Data.Category }}</li>
+    {{ if .Data.Labels }}
+    {{ range $i, $label := .Data.Labels.Nodes }}
+    <li class="li">{{ template "LabelItemTemplate" $label }}</li>
+    {{ end }}
+    {{ end }}
+  </ul>
+  <ul class="ul" style="text-align: center; margin: 30px auto;">
+    {{ if .Data.UpvoteCount }}
+    <li class="li reaction"><a href="{{ $githubURL }}">
+        <span>{{ template "VoteSVGTemplate" 26 }} {{ .Data.UpvoteCount }}</span></a>
+    </li>
+    {{ end }}
+    <li class="li reaction">
+      <a href="{{ $githubURL }}"><span class="SMILING"></span></a>
+    </li>
+    {{ range $reaction := .Data.ReactionGroups }}
+    {{ if $reaction.Reactors.TotalCount }}
+    <li class="li reaction">
+      <a href="{{ $githubURL }}"><span class="{{ $reaction.Content }}">
+          {{ $reaction.Reactors.TotalCount }}</span></a>
+    </li>
+    {{ end }}
+    {{ end }}
+  </ul>
+  <div style="display: flex; align-items: center; margin: 30px auto;">
+    <div style="flex: 1; height: 1px; background-color: #ddd;"></div>
+    <span class="COMMENT" style="margin: 0 12px"></span>
+    <div style="flex: 1; height: 1px; background-color: #ddd;"></div>
+  </div>
+  {{ if .Data.Comments }}
+  <ul class="ul" style="margin: 30px auto; font-size: 1rem;">
+    {{ range $comment := .Data.Comments.Nodes }}
+    <li class="li comment">
+      {{ template "CommentItemTemplate" $comment }}
+    </li>
+    {{ end }}
+  </ul>
+  {{ end }}
+  <a href="{{ $githubURL }}#reply" class="comment-input">前往 GitHub Discussion 评论</a>
   {{ template "footerTemplate" .Viewer }}
 </body>
 

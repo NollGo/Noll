@@ -47,6 +47,17 @@ a[href]:active {
   background-color: #ddd;
 }
 
+a.text {
+  border-radius: 0;
+  padding      : 0;
+}
+
+a.text[href]:hover,
+a.text[href]:active {
+  background-color: transparent;
+  color           : black;
+}
+
 .margin-right-5px-without-last:not(:last-of-type) {
   margin-right: 5px;
 }
