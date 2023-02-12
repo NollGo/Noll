@@ -7,6 +7,9 @@
   <li class="li"><a href="/archive/1.html">
       <h4 style="display: contents;">🗂️ 归档</h4>
     </a></li>
+  <li class="li"><a href="/categories.html">
+      <h4 style="display: contents;">📑 分类</h4>
+    </a></li>
   <li class="li"><a href="/about.html">
       <h4 style="display: contents;">👉 About</h4>
     </a></li>

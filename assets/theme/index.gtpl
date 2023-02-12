@@ -14,9 +14,14 @@
     <div class="flex-fill">
       <h1>近期文章</h1>
       {{ template "DiscussionGroup2Template" .Data }}
+      <ul class="ul" style="margin-left: -10px;">
+        <li class="li">
+          <a href="/archive/1.html">更多文章 >>></a>
+        </li>
+      </ul>
     </div>
     <div>
-      <h1>标签 ({{ .Labels.TotalCount }})</h1>
+      <h1>标签</h1>
       {{ template "LabelGroupTemplate" .Labels }}
     </div>
   </div>
