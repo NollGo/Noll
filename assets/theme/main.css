@@ -102,7 +102,11 @@ a[href]:active {
   content: "💬";
 }
 
-.THUMBS_UP,
+.SMILING::before {
+  content: "🙂";
+}
+
+/* .THUMBS_UP,
 .THUMBS_DOWN,
 .LAUGH,
 .HOORAY,
@@ -112,4 +116,4 @@ a[href]:active {
 .EYES,
 .COMMENT {
   font-size: 1rem;
-}
+} */
