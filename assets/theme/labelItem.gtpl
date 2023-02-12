@@ -1,3 +1,3 @@
 {{define "LabelTemplate"}}
-<span style='color: #{{.Color}};'>#{{ .Name }}</span>
+<span {{ template "ColorStyleTemplate" .Color }}>#{{ .Name }}</span>
 {{end}}

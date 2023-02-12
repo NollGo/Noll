@@ -165,12 +165,12 @@ func render(data *GithubData, themeTmplDir string, debug bool, writer WriterFunc
 	}
 
 	labelTemplate := themeTemplate.Lookup("label.gtpl")
-	for i, label := range data.Repository.Labels.Nodes {
+	for _, label := range data.Repository.Labels.Nodes {
 		_data.Data = label
 		if err = labelTemplate.Execute(stringWriter.Reset(), _data); err != nil {
 			return err
 		}
-		htmlPages[fmt.Sprintf(`label/%v.gtpl`, i+1)] = stringWriter.String()
+		htmlPages[fmt.Sprintf(`label/%v.gtpl`, label.Name)] = stringWriter.String()
 	}
 
 	postTemplate := themeTemplate.Lookup("post.gtpl")
