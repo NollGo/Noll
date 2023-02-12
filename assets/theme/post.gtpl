@@ -13,15 +13,15 @@
   <time>{{ .Data.CreatedAt }}</time>
   <article class="markdown">
     <div> {{ .Data.BodyHTML }} </div>
-    <div style="display: flex;">
-      <label>{{ .Data.Category.Name }}</label>
-    </div>
+    <ul class="ul" style="margin-left: -10px;">
+      <li class="li">{{ template "CategoryItemTemplate" .Data.Category }}</li>
+    </ul>
     {{ if .Data.Labels }}
-    <div>
-      {{ range $label := .Data.Labels.Nodes }}
-      {{ template "LabelItemTemplate" $label }}
+    <ul class="ul" style="margin-left: -10px;">
+      {{ range $i, $label := .Data.Labels.Nodes }}
+      <li class="li">{{ template "LabelItemTemplate" $label }}</li>
       {{ end }}
-    </div>
+    </ul>
     {{ end }}
     {{ if .Data.Comments }}
     <h4>去评论</h4>
