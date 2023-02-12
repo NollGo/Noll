@@ -99,6 +99,7 @@ type CommentPage struct {
 // Comment is Github Discussion comment scheme
 type Comment struct {
 	Body              string           `json:"body"`
+	BodyHTML          string           `json:"bodyHTML"`
 	UpvoteCount       int              `json:"upvoteCount"`
 	AuthorAssociation string           `json:"authorAssociation"`
 	CreatedAt         time.Time        `json:"createdAt"`

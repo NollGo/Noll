@@ -176,6 +176,7 @@ func getCommentPage(owner, name, token string, discussionNumber int, afterCursor
 					totalCount
 					nodes {
 						body
+						bodyHTML
 						createdAt
 						author {
 							avatarUrl
