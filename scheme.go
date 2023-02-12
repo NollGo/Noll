@@ -131,3 +131,11 @@ type User struct {
 	Name      string `json:"name"`
 	Twitter   string `json:"twitterUsername"`
 }
+
+// ShowName 返回该用户的对外显示的名字
+func (u *User) ShowName() string {
+	if u.Name != "" {
+		return u.Name
+	}
+	return u.Login
+}

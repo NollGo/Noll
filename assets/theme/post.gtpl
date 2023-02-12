@@ -31,7 +31,7 @@
     <ul class="ul">
       {{ range $comment := .Data.Comments.Nodes }}
       <li class="li">
-        <div>{{ $comment.BodyHTML }}</div>
+        {{ template "CommentItemTemplate" $comment }}
       </li>
       {{ end }}
       </div>

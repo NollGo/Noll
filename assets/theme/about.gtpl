@@ -3,13 +3,13 @@
 
 <head>
   {{ template "HeadTemplate" .Viewer }}
-  <title>Aoubt —— {{ .Viewer.Name }}'s Blog </title>
+  <title>Aoubt —— {{ .Viewer.ShowName }}'s Blog </title>
 </head>
 
 <body>
   {{ template "HeaderTemplate" . }}
   <div class="clearfix"></div>
-  <h1>About {{ .Viewer.Name }}</h1>
+  <h1>About {{ .Viewer.ShowName }}</h1>
   {{ if .Viewer.Bio }}
   <p>{{ .Viewer.Bio }}</p>
   {{ end }}

@@ -21,9 +21,6 @@ func getRepository(owner, name, token string) (*GithubData, error) {
 	if err != nil {
 		return nil, err
 	}
-	if viewer.Name == "" {
-		viewer.Name = viewer.Login
-	}
 	// 标签集合
 	lables, err := getLabels(owner, name, token)
 	if err != nil {

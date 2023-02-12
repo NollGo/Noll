@@ -3,7 +3,7 @@
 
 <head>
   {{ template "HeadTemplate" .Viewer }}
-  <title>归档 —— {{ .Viewer.Name }}'s Blog </title>
+  <title>归档 —— {{ .Viewer.ShowName }}'s Blog </title>
 </head>
 
 <body>
