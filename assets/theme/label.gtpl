@@ -9,7 +9,7 @@
 <body {{ template "ColorStyleTemplate" .Data.Color }}>
   {{ template "HeaderTemplate" . }}
   <div>
-    <h1> {{ .Data.Name }} </h1>
+    <h1> #{{ .Data.Name }} </h1>
     {{ .Data.Description }}
     {{ template "DiscussionGroupTemplate" .Data.Discussions }}
   </div>

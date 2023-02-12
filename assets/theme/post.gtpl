@@ -23,7 +23,7 @@
     {{ if .Data.Labels }}
     <div>
       {{ range $label := .Data.Labels.Nodes }}
-      {{ template "LabelTemplate" $label }}
+      {{ template "LabelItemTemplate" $label }}
       {{ end }}
     </div>
     {{ end }}
