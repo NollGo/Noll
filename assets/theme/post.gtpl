@@ -6,13 +6,25 @@
 <head>
   {{ template "HeadTemplate" .Viewer }}
   <title> {{ .Data.Title }}</title>
+  <link rel="stylesheet" href="https://sindresorhus.com/github-markdown-css/github-markdown.css">
   <style>
-    .markdown p {
-      line-height: 1.4;
+    .mermaid {
+      text-align: center;
+      background-color: transparent !important;
     }
 
-    .markdown:first-of-type {
+    article:first-of-type {
       margin-top: 40px;
+    }
+
+    table {
+      width: 100% !important;
+      min-width: 100% !important;
+      display: table !important;
+    }
+
+    .markdown-body a {
+      padding: 3px 6px;
     }
 
     .reaction+.reaction {
@@ -49,7 +61,7 @@
         {{ .Data.CreatedAt.Format "01-02-2006" }}</time>
     </div>
   </div>
-  <article class="markdown">
+  <article class="markdown-body" style="font-size: 1.2rem;">
     {{ .Data.BodyHTML }}
   </article>
   <ul class="ul" style="margin: 30px -10px;">
@@ -94,6 +106,23 @@
   {{ end }}
   <a href="{{ $githubURL }}#reply" class="comment-input">前往 GitHub Discussion 评论</a>
   {{ template "footerTemplate" .Viewer }}
+  <script>
+    var mermaidEls = document.getElementsByClassName('notranslate')
+    for (let index = 0; index < mermaidEls.length; index++) {
+      const element = mermaidEls[index];
+      if (element.getAttribute('lang') === 'mermaid') {
+        element.classList.add('mermaid')
+      }
+    }
+    var loaderEls = document.getElementsByClassName('js-render-enrichment-loader')
+    for (let index = 0; index < loaderEls.length;) {
+      const element = loaderEls[index];
+      element.parentElement.removeChild(element)
+    }
+  </script>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@9/dist/mermaid.min.js"></script>
+  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </body>
 
 </html>

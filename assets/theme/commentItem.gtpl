@@ -11,7 +11,7 @@
       <div style="flex: 1;"></div>
       <a class="text" href="{{ .GitHubURL }}">回复</a>
     </div>
-    <article>{{ .BodyHTML }}</article>
+    <div class="markdown-body" style="margin: 12px 0;">{{ .BodyHTML }}</div>
     <ul class="ul column">
       <li class="li">
         <span>{{ template "VoteSVGTemplate" 22 }} {{ .UpvoteCount }}</span>
