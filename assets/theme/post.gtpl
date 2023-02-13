@@ -24,7 +24,14 @@
     }
 
     .markdown-body a {
-      padding: 3px 6px;
+      border-radius: 0;
+      padding: 0;
+      display: inline-block;
+    }
+
+    .markdown-body a:hover,
+    .markdown-body a:active {
+      background-color: transparent;
     }
 
     .reaction+.reaction {
@@ -60,6 +67,7 @@
       于<time style="margin-left: 5px" title="{{ .Data.CreatedAt }}">
         {{ .Data.CreatedAt.Format "01-02-2006" }}</time>
     </div>
+    <div id="map" style="height: 500px;"></div>
   </div>
   <article class="markdown-body" style="font-size: 1.2rem;">
     {{ .Data.BodyHTML }}
@@ -117,12 +125,111 @@
     var loaderEls = document.getElementsByClassName('js-render-enrichment-loader')
     for (let index = 0; index < loaderEls.length;) {
       const element = loaderEls[index];
+      // removeChild 后，loaderEls 中也失去该 child
       element.parentElement.removeChild(element)
     }
   </script>
   <script src="https://cdn.jsdelivr.net/npm/mermaid@9/dist/mermaid.min.js"></script>
-  <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+  <script>
+    // https://docs.mathjax.org/en/latest/web/start.html
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']]
+      }
+    };
+  </script>
+  <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.3.1/dist/leaflet.css"
+    integrity="sha512-Rksm5RenBEKSKFjgI3a41vrjkw4EVPlJ3+OiI65vTjIdo9brlAacEuKOiQ5OFh7cOI1bkDwLqdLw3Zg0cRJAAQ=="
+    crossorigin="" />
+  <script src="https://unpkg.com/leaflet@1.3.1/dist/leaflet.js"
+    integrity="sha512-/Nsx9X4HebavoBvEBuyp3I7od5tA0UzAxs+j83KgC8PU0kgB4XiK4Lfe4y4cgBtaRJQEIFCW+oC506aPT2L1zw=="
+    crossorigin=""></script>
+  <script src="https://unpkg.com/topojson@3.0.2/dist/topojson.min.js"></script>
+  <script>
+    function maprender(target, dataType, data) {
+      // 初始化地图
+      var map = L.map(target).setView([48.505, -0.09], 7);
+
+      // 加载地图底图
+      // https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png
+      let bgLayerPositron = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="http://cartodb.com/attributions">CartoDB</a>',
+        subdomains: 'abcd',
+        maxZoom: 19
+      });
+
+      bgLayerPositron.addTo(map);
+
+      //extend Leaflet to create a GeoJSON layer from a TopoJSON file
+      L.TopoJSON = L.GeoJSON.extend({
+        addData: function (data) {
+          var geojson, key;
+          if (data.type === "Topology") {
+            for (key in data.objects) {
+              if (data.objects.hasOwnProperty(key)) {
+                geojson = topojson.feature(data, data.objects[key]);
+                L.GeoJSON.prototype.addData.call(this, geojson);
+              }
+            }
+            return this;
+          }
+          L.GeoJSON.prototype.addData.call(this, data);
+          return this;
+        }
+      });
+      L.topoJson = function (data, options) {
+        return new L.TopoJSON(data, options);
+      };
+
+      if (dataType === 'geojson') {
+        // 加载 GeoJSON 数据
+        var geojson = L.geoJson(null, {
+          style: function (feature) {
+            let color = feature.properties.color | '#35495d'
+            return { color: color };
+          }
+        }).addTo(map)
+        let area = geojson.addData(data);
+        // 定位到当前加载数据的区域
+        map.fitBounds(area.getBounds());
+      } else {
+        //create an empty geojson layer
+        //with a style and a popup on click
+        var geojson = L.topoJson(null, {
+          style: function (feature) {
+            return {
+              color: "#000",
+              opacity: 1,
+              weight: 1,
+              fillColor: '#35495d',
+              fillOpacity: 0.8
+            }
+          },
+          onEachFeature: function (feature, layer) {
+            if (feature.properties.name) {
+              layer.bindPopup('<p>' + feature.properties.name + '</p>')
+            }
+          }
+        }).addTo(map);
+        let area = geojson.addData(data);
+        // 定位到当前加载数据的区域
+        map.fitBounds(area.getBounds());
+      }
+    }
+    var maps = document.getElementsByTagName('section')
+    for (let index = 0; index < maps.length; index++) {
+      const element = maps[index]
+      let dataType = element.getAttribute('data-type')
+      if (dataType === 'geojson' || dataType === 'topojson') {
+        let target = element.firstElementChild
+        let data = JSON.parse(target.getAttribute('data-plain'))
+        target.style.height = '400px'
+        target.innerHTML = ''
+        maprender(target, dataType, data)
+      }
+    }
+  </script>
 </body>
 
 </html>

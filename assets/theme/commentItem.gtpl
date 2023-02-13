@@ -4,7 +4,7 @@
     <a class="text" href="{{ .Author.GitHubURL }}">
       <img src="{{ .Author.AvatarURL }}" style="width: 3rem; height: 3rem;" /></a>
   </div>
-  <div style="margin-left: 10px">
+  <div style="margin-left: 10px; flex: 1;">
     <div style="display: flex; color: #555;">
       <a class="text" href="{{ .Author.GitHubURL }}">{{ .Author.ShowName }}</a>
       <time style="margin: 0 10px" title="{{ .UpdatedAt }}"> {{ .UpdatedAt.Format "01-02" }} </time>
