@@ -319,6 +319,11 @@ endsolid`;
       // ASCII string
       const loader = new STLLoader();
       var buffer = new TextEncoder().encode(string).buffer;
+      // 核心代码
+      // 如果是 stl 字符串，而不是文件，则是应使用 parse 函数加载模型，
+      // 加载成功后，调用 `scene.add()` 函数显示模型。
+      // 特别注意：此函数（`parse()`）是同步函数，所以会直接返回一个模型对象，
+      //          和 load 函数不同，load 函数是异步加载的，所以需要在回调函数里把模型显示出来。
       var result = loader.parse(buffer)
       console.log(result);
 
