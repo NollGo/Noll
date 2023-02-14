@@ -18,9 +18,23 @@
     }
 
     table {
-      width: 100% !important;
-      min-width: 100% !important;
-      display: table !important;
+      white-space: nowrap;
+    }
+
+    .d-inline-block {
+      display: inline-block !important;
+    }
+
+    .ml-1 {
+      margin-left: 4px !important;
+    }
+
+    .circle {
+      border-radius: 50% !important;
+    }
+
+    .border {
+      border: 1px solid var(--color-border-default) !important;
     }
 
     .markdown-body a {

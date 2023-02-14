@@ -295,6 +295,7 @@
       let target = element.firstElementChild
       let data = target.getAttribute('data-plain')
       target.style.height = '400px'
+      target.style.cursor = 'grab'
       target.innerHTML = ''
       let stl3d = new STL3DElement(target, data)
       stl3d.render2()
