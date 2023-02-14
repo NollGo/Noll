@@ -8,6 +8,29 @@ import (
 	"time"
 )
 
+func TestStringContains(t *testing.T) {
+	if strings.Contains(`{
+		repository(owner: "excing", name: "find-roots-of-word") {
+			discussionCategories(first: 10) {
+				nodes {
+					id 
+					name
+					emoji
+					description
+				}
+				totalCount
+			}
+		}
+		viewer {
+			login
+		}
+	}`, `first: 11`) {
+		t.Log()
+	} else {
+		t.Fail()
+	}
+}
+
 func TestTimeConvert(t *testing.T) {
 	timeStr := ""
 	time, err := time.Parse("2006-01-02 15:04:05", timeStr)

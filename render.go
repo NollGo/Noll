@@ -20,6 +20,33 @@ type RenderData struct {
 	Data       interface{}
 }
 
+// JsRenderLoader js 渲染加载器
+// 包含数学公式、图表、地图和三维模型
+type JsRenderLoader struct {
+	HTML       string
+	HasMermaid bool
+	HasMathjax bool
+	HasGeojson bool
+	HasSTL3D   bool
+}
+
+// Has 返回 Html 中是否包含需要 js 渲染的内容
+func (l *JsRenderLoader) Has() bool {
+	if strings.Contains(l.HTML, `data-type="geojsin"`) || strings.Contains(l.HTML, `data-type="topojson"`) {
+		l.HasGeojson = true
+	}
+	if strings.Contains(l.HTML, `</math-renderer>`) {
+		l.HasMathjax = true
+	}
+	if strings.Contains(l.HTML, `data-type="mermaid"`) {
+		l.HasMermaid = true
+	}
+	if strings.Contains(l.HTML, `data-type="stl"`) {
+		l.HasSTL3D = true
+	}
+	return l.HasGeojson || l.HasMathjax || l.HasMermaid || l.HasSTL3D
+}
+
 // WriterFunc 向指定文件写入内容
 type WriterFunc func(string, []byte) error
 
@@ -117,6 +144,15 @@ func render(data *GithubData, themeTmplDir string, debug bool, writer WriterFunc
 		return err
 	}
 
+	jsRenderLoaderBS, err := readGlobalFile("js-render-loader.gtpl")
+	if err != nil {
+		return err
+	}
+	jsRenderTemplate, err := template.New("jsRenderLoader").Parse(string(jsRenderLoaderBS))
+	if err != nil {
+		return err
+	}
+
 	// 3. 拷贝无需渲染的主题文件到目标文件夹
 	if err = copyNonRenderFiles(r, "", writer); err != nil {
 		return err
@@ -178,6 +214,10 @@ func render(data *GithubData, themeTmplDir string, debug bool, writer WriterFunc
 		_data.Data = discussion
 		if err = postTemplate.Execute(stringWriter.Reset(), _data); err != nil {
 			return err
+		}
+		jrl := &JsRenderLoader{HTML: stringWriter.String()}
+		if jrl.Has() {
+			jsRenderTemplate.Execute(stringWriter, jrl)
 		}
 		htmlPages[fmt.Sprintf(`post/%v.gtpl`, discussion.Number)] = stringWriter.String()
 	}
