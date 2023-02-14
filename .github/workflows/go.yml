@@ -15,6 +15,15 @@ jobs:
     - name: Check out code
       uses: actions/checkout@v1
 
+    - name: Get service dependencies
+      working-directory: ./
+      run:  |
+        go get -v -u -d ./...
+        if [ -f Gopkg.toml ]; then
+            curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+            dep ensure
+        fi
+
     - name: Validates GO releaser config
       uses: docker://goreleaser/goreleaser:latest
       with:
