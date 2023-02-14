@@ -67,7 +67,7 @@
       于<time style="margin-left: 5px" title="{{ .Data.CreatedAt }}">
         {{ .Data.CreatedAt.Format "01-02-2006" }}</time>
     </div>
-    <div id="container" style="width: 100%; height: 500px; position: relative;"></div>
+    <!-- <div id="container" style="width: 100%; height: 500px; position: relative;"></div> -->
   </div>
   <article class="markdown-body" style="font-size: 1.2rem;">
     {{ .Data.BodyHTML }}
@@ -252,170 +252,311 @@
 
     import { OrbitControls } from 'threeAddons/controls/OrbitControls.js';
 
-    var string = `solid cube_corner
-facet normal 0.0 -1.0 0.0
-  outer loop
-    vertex 0.0 0.0 0.0
-    vertex 1.0 0.0 0.0
-    vertex 0.0 0.0 1.0
-  endloop
-endfacet
-facet normal 0.0 0.0 -1.0
-  outer loop
-    vertex 0.0 0.0 0.0
-    vertex 0.0 1.0 0.0
-    vertex 1.0 0.0 0.0
-  endloop
-endfacet
-facet normal -1.0 0.0 0.0
-  outer loop
-    vertex 0.0 0.0 0.0
-    vertex 0.0 0.0 1.0
-    vertex 0.0 1.0 0.0
-  endloop
-endfacet
-facet normal 0.577 0.577 0.577
-  outer loop
-    vertex 1.0 0.0 0.0
-    vertex 0.0 1.0 0.0
-    vertex 0.0 0.0 1.0
-  endloop
-endfacet
-endsolid`;
+    class STL3DElement {
+      constructor(container, stlString, controlChanged = false) {
+        this.container = container;
 
-    let container, stats;
+        this.controlChanged = controlChanged;
 
-    let camera, cameraTarget, scene, renderer;
+        this.camera = new THREE.PerspectiveCamera(35, this.container.offsetWidth / this.container.offsetHeight, 1, 150);
+        this.camera.position.set(3, 1.15, 4);
 
-    init();
-    animate();
+        this.cameraTarget = new THREE.Vector3(0, -0.0, 0);
 
-    function init() {
+        this.scene = new THREE.Scene();
+        this.scene.background = new THREE.Color(0xffffff);
+        // 远景模糊效果
+        this.scene.fog = new THREE.Fog(0xffffff, 2, 70);
 
-      container = document.getElementById('container')
-      document.body.appendChild(container);
+        // Ground
 
-      camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1, 15);
-      camera.position.set(3, 0.15, 3);
+        const planeGeometry = new THREE.PlaneGeometry(40, 40, 20, 20);
+        var planeMaterial = new THREE.LineBasicMaterial({ color: 0x111111 });
+        var plane = new THREE.Line(planeGeometry, planeMaterial);
+        // const planeMaterial = new THREE.MeshBasicMaterial({ color: 0x999999, side: THREE.DoubleSide });
+        // const plane = new THREE.Mesh(planeGeometry, planeMaterial);
 
-      cameraTarget = new THREE.Vector3(0, - 0.25, 0);
+        // const positions = planeGeometry.attributes.position.array;
+        // for (let i = 0; i < positions.length; i += 3) {
+        //   positions[i] += Math.sin(i / 2) * 0.5;
+        //   positions[i + 1] += Math.cos(i / 4) * 0.5;
+        // }
 
-      scene = new THREE.Scene();
-      scene.background = new THREE.Color(0x72645b);
-      scene.fog = new THREE.Fog(0x72645b, 2, 15);
+        plane.rotation.x = Math.PI / 2;
+        plane.position.set(-0.0, -0.0, 0);
+        this.scene.add(plane);
 
-      // Ground
+        plane.receiveShadow = true;
 
-      const plane = new THREE.Mesh(
-        new THREE.PlaneGeometry(40, 40),
-        new THREE.MeshPhongMaterial({ color: 0x999999, specular: 0x101010 })
-      );
-      plane.rotation.x = - Math.PI / 2;
-      plane.position.y = - 0.5;
-      scene.add(plane);
+        // ASCII string
+        const loader = new STLLoader();
+        // 核心代码
+        // 如果是 stl 字符串，而不是文件，则是应使用 parse 函数加载模型，
+        // 加载成功后，调用 `scene.add()` 函数显示模型。
+        // 特别注意：此函数（`parse()`）是同步函数，所以会直接返回一个模型对象，
+        //          和 load 函数不同，load 函数是异步加载的，所以需要在回调函数里把模型显示出来。
+        var result = loader.parse(stlString)
 
-      // plane.receiveShadow = true;
+        const material = new THREE.MeshPhongMaterial({ color: 0x115599, specular: 0x111111, shininess: 200 });
+        const mesh = new THREE.Mesh(result, material);
 
-      // ASCII string
-      const loader = new STLLoader();
-      var buffer = new TextEncoder().encode(string).buffer;
-      // 核心代码
-      // 如果是 stl 字符串，而不是文件，则是应使用 parse 函数加载模型，
-      // 加载成功后，调用 `scene.add()` 函数显示模型。
-      // 特别注意：此函数（`parse()`）是同步函数，所以会直接返回一个模型对象，
-      //          和 load 函数不同，load 函数是异步加载的，所以需要在回调函数里把模型显示出来。
-      var result = loader.parse(buffer)
-      console.log(result);
+        mesh.position.set(0, 0, 0);
+        mesh.rotation.set(0, - Math.PI / 2, 0);
+        mesh.scale.set(0.5, 0.5, 0.5);
 
-      const material = new THREE.MeshPhongMaterial({ color: 0xff5533, specular: 0x111111, shininess: 200 });
-      const mesh = new THREE.Mesh(result, material);
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
 
-      mesh.position.set(0, - 0.25, 0.6);
-      mesh.rotation.set(0, - Math.PI / 2, 0);
-      mesh.scale.set(0.5, 0.5, 0.5);
+        this.scene.add(mesh);
 
-      mesh.castShadow = true;
-      mesh.receiveShadow = true;
+        // Lights
 
-      scene.add(mesh);
+        this.scene.add(new THREE.HemisphereLight(0xffffff, 0xffffff));
 
-      // Lights
+        // addShadowedLight(1, 1, 1, 0xffffff, 1.35);
+        this.addShadowedLight(0.5, 1, - 1, 0xffffff, 1);
 
-      scene.add(new THREE.HemisphereLight(0xffffff, 0xffffff));
+        // renderer
 
-      // addShadowedLight(1, 1, 1, 0xffffff, 1.35);
-      // addShadowedLight(0.5, 1, - 1, 0xffaa00, 1);
-      // renderer
+        this.renderer = new THREE.WebGLRenderer({ antialias: true });
+        this.renderer.setPixelRatio(window.devicePixelRatio);
+        this.renderer.setSize(container.offsetWidth, container.offsetHeight);
+        this.renderer.outputEncoding = THREE.sRGBEncoding;
 
-      renderer = new THREE.WebGLRenderer({ antialias: true });
-      renderer.setPixelRatio(window.devicePixelRatio);
-      renderer.setSize(container.offsetWidth, container.offsetHeight);
-      renderer.outputEncoding = THREE.sRGBEncoding;
+        this.renderer.shadowMap.enabled = true;
 
-      renderer.shadowMap.enabled = true;
+        var controls = new OrbitControls(this.camera, this.renderer.domElement);
+        controls.addEventListener('change', this.render2.bind(this));
 
-      var controls = new OrbitControls(camera, renderer.domElement);
-      controls.addEventListener('change', render);
+        this.container.appendChild(this.renderer.domElement);
 
-      container.appendChild(renderer.domElement);
+        // stats
+        this.stats = new Stats();
+        this.stats.dom.style = 'position: absolute; top: 0; left: 0;'
+        this.container.style.position = 'relative'
+        this.container.appendChild(this.stats.dom);
+      }
 
-      // stats
-      stats = new Stats();
-      stats.dom.style = 'position: absolute; top: 0; left: 0;'
-      container.appendChild(stats.dom);
+      animate() {
+        if (this.controlChanged) return
 
-      // window resize
+        requestAnimationFrame(this.animate.bind(this));
 
-      window.addEventListener('resize', onWindowResize);
+        this.render();
 
+        this.stats.update();
+      }
+
+      render() {
+        const timer = Date.now() * 0.0005;
+
+        this.camera.position.x = Math.cos(timer) * 3;
+        this.camera.position.z = Math.sin(timer) * 3;
+
+        this.camera.lookAt(this.cameraTarget);
+
+        this.renderer.render(this.scene, this.camera);
+      }
+
+      render2() {
+        this.camera.lookAt(this.cameraTarget);
+
+        this.renderer.render(this.scene, this.camera);
+
+        this.stats.update();
+
+        this.controlChanged = true
+      }
+
+      addShadowedLight(x, y, z, color, intensity) {
+        const directionalLight = new THREE.DirectionalLight(color, intensity);
+        directionalLight.position.set(x, y, z);
+        this.scene.add(directionalLight);
+
+        directionalLight.castShadow = true;
+
+        const d = 1;
+        directionalLight.shadow.camera.left = - d;
+        directionalLight.shadow.camera.right = d;
+        directionalLight.shadow.camera.top = d;
+        directionalLight.shadow.camera.bottom = - d;
+
+        directionalLight.shadow.camera.near = 1;
+        directionalLight.shadow.camera.far = 4;
+
+        directionalLight.shadow.bias = - 0.002;
+      }
+
+      onWindowResize() {
+        this.camera.aspect = this.container.offsetWidth / this.container.offsetHeight;
+        this.camera.updateProjectionMatrix();
+
+        this.renderer.setSize(this.container.offsetWidth, this.container.offsetHeight);
+      }
     }
 
-    function addShadowedLight(x, y, z, color, intensity) {
-
-      const directionalLight = new THREE.DirectionalLight(color, intensity);
-      directionalLight.position.set(x, y, z);
-      scene.add(directionalLight);
-
-      directionalLight.castShadow = true;
-
-      const d = 1;
-      directionalLight.shadow.camera.left = - d;
-      directionalLight.shadow.camera.right = d;
-      directionalLight.shadow.camera.top = d;
-      directionalLight.shadow.camera.bottom = - d;
-
-      directionalLight.shadow.camera.near = 1;
-      directionalLight.shadow.camera.far = 4;
-
-      directionalLight.shadow.bias = - 0.002;
-
+    var maps = document.getElementsByTagName('section')
+    for (let index = 0; index < maps.length; index++) {
+      const element = maps[index]
+      let dataType = element.getAttribute('data-type')
+      if (dataType === 'stl') {
+        let target = element.firstElementChild
+        let data = target.getAttribute('data-plain')
+        target.style.height = '400px'
+        target.innerHTML = ''
+        new STL3DElement(target, data).render2()
+      }
     }
 
-    function onWindowResize() {
-      camera.aspect = window.innerWidth / window.innerHeight;
-      camera.updateProjectionMatrix();
+    // let container, stats;
 
-      renderer.setSize(container.offsetWidth, container.offsetHeight);
-    }
+    // let camera, cameraTarget, scene, renderer;
 
-    function animate() {
-      requestAnimationFrame(animate);
+    // init();
+    // animate();
 
-      render();
-      stats.update();
-    }
+    // function init() {
 
-    function render() {
-      const timer = Date.now() * 0.0005;
+    //   container = document.getElementById('container')
 
-      camera.position.x = Math.cos(timer) * 3;
-      camera.position.z = Math.sin(timer) * 3;
+    //   camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1, 15);
+    //   camera.position.set(3, 1.15, 4);
 
-      camera.lookAt(cameraTarget);
+    //   cameraTarget = new THREE.Vector3(0, -0.0, 0);
 
-      renderer.render(scene, camera);
+    //   scene = new THREE.Scene();
+    //   scene.background = new THREE.Color(0xffffff);
+    //   scene.fog = new THREE.Fog(0xffffff, 2, 15);
 
-    }
+    //   // Ground
+
+    //   const planeGeometry = new THREE.PlaneGeometry(40, 40, 20, 20);
+    //   var planeMaterial = new THREE.LineBasicMaterial({ color: 0x111111 });
+    //   var plane = new THREE.Line(planeGeometry, planeMaterial);
+    //   // const planeMaterial = new THREE.MeshBasicMaterial({ color: 0x999999, side: THREE.DoubleSide });
+    //   // const plane = new THREE.Mesh(planeGeometry, planeMaterial);
+
+    //   // const positions = planeGeometry.attributes.position.array;
+    //   // for (let i = 0; i < positions.length; i += 3) {
+    //   //   positions[i] += Math.sin(i / 2) * 0.5;
+    //   //   positions[i + 1] += Math.cos(i / 4) * 0.5;
+    //   // }
+
+    //   plane.rotation.x = Math.PI / 2;
+    //   plane.position.set(-0.0, -0.0, 0);
+    //   scene.add(plane);
+
+    //   plane.receiveShadow = true;
+
+    //   // ASCII string
+    //   const loader = new STLLoader();
+    //   // 核心代码
+    //   // 如果是 stl 字符串，而不是文件，则是应使用 parse 函数加载模型，
+    //   // 加载成功后，调用 `scene.add()` 函数显示模型。
+    //   // 特别注意：此函数（`parse()`）是同步函数，所以会直接返回一个模型对象，
+    //   //          和 load 函数不同，load 函数是异步加载的，所以需要在回调函数里把模型显示出来。
+    //   var result = loader.parse(string)
+
+    //   const material = new THREE.MeshPhongMaterial({ color: 0x115599, specular: 0x111111, shininess: 200 });
+    //   const mesh = new THREE.Mesh(result, material);
+
+    //   mesh.position.set(0, 0, 0);
+    //   mesh.rotation.set(0, - Math.PI / 2, 0);
+    //   mesh.scale.set(0.5, 0.5, 0.5);
+
+    //   mesh.castShadow = true;
+    //   mesh.receiveShadow = true;
+
+    //   scene.add(mesh);
+
+    //   // Lights
+
+    //   scene.add(new THREE.HemisphereLight(0xffffff, 0xffffff));
+
+    //   // addShadowedLight(1, 1, 1, 0xffffff, 1.35);
+    //   addShadowedLight(0.5, 1, - 1, 0xffffff, 1);
+    //   // renderer
+
+    //   renderer = new THREE.WebGLRenderer({ antialias: true });
+    //   renderer.setPixelRatio(window.devicePixelRatio);
+    //   renderer.setSize(container.offsetWidth, container.offsetHeight);
+    //   renderer.outputEncoding = THREE.sRGBEncoding;
+
+    //   renderer.shadowMap.enabled = true;
+
+    //   var controls = new OrbitControls(camera, renderer.domElement);
+    //   controls.addEventListener('change', render2);
+
+    //   container.appendChild(renderer.domElement);
+
+    //   // stats
+    //   stats = new Stats();
+    //   stats.dom.style = 'position: absolute; top: 0; left: 0;'
+    //   container.appendChild(stats.dom);
+
+    //   // window resize
+
+    //   window.addEventListener('resize', onWindowResize);
+    // }
+
+    // function addShadowedLight(x, y, z, color, intensity) {
+    //   const directionalLight = new THREE.DirectionalLight(color, intensity);
+    //   directionalLight.position.set(x, y, z);
+    //   scene.add(directionalLight);
+
+    //   directionalLight.castShadow = true;
+
+    //   const d = 1;
+    //   directionalLight.shadow.camera.left = - d;
+    //   directionalLight.shadow.camera.right = d;
+    //   directionalLight.shadow.camera.top = d;
+    //   directionalLight.shadow.camera.bottom = - d;
+
+    //   directionalLight.shadow.camera.near = 1;
+    //   directionalLight.shadow.camera.far = 4;
+
+    //   directionalLight.shadow.bias = - 0.002;
+
+    // }
+
+    // function onWindowResize() {
+    //   camera.aspect = window.innerWidth / window.innerHeight;
+    //   camera.updateProjectionMatrix();
+
+    //   renderer.setSize(container.offsetWidth, container.offsetHeight);
+    // }
+
+    // function animate() {
+    //   if (controlChanged) return
+
+    //   requestAnimationFrame(animate);
+
+    //   render();
+    //   stats.update();
+    // }
+
+    // var controlChanged = false
+    // function render2() {
+    //   camera.lookAt(cameraTarget);
+
+    //   renderer.render(scene, camera);
+
+    //   stats.update();
+
+    //   controlChanged = true
+    // }
+
+    // function render() {
+    //   const timer = Date.now() * 0.0005;
+
+    //   camera.position.x = Math.cos(timer) * 3;
+    //   camera.position.z = Math.sin(timer) * 3;
+
+    //   camera.lookAt(cameraTarget);
+
+    //   renderer.render(scene, camera);
+
+    // }
   </script>
 </body>
 
