@@ -258,7 +258,7 @@
 
         this.controlChanged = controlChanged;
 
-        this.camera = new THREE.PerspectiveCamera(35, this.container.offsetWidth / this.container.offsetHeight, 1, 150);
+        this.camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1, 150);
         this.camera.position.set(3, 1.15, 4);
 
         this.cameraTarget = new THREE.Vector3(0, -0.0, 0);
@@ -388,7 +388,7 @@
       }
 
       onWindowResize() {
-        this.camera.aspect = this.container.offsetWidth / this.container.offsetHeight;
+        this.camera.aspect = window.innerWidth / window.innerHeight;
         this.camera.updateProjectionMatrix();
 
         this.renderer.setSize(this.container.offsetWidth, this.container.offsetHeight);
@@ -396,6 +396,7 @@
     }
 
     var maps = document.getElementsByTagName('section')
+    var stl3ds = []
     for (let index = 0; index < maps.length; index++) {
       const element = maps[index]
       let dataType = element.getAttribute('data-type')
@@ -404,159 +405,17 @@
         let data = target.getAttribute('data-plain')
         target.style.height = '400px'
         target.innerHTML = ''
-        new STL3DElement(target, data).render2()
+        let stl3d = new STL3DElement(target, data)
+        stl3d.render2()
+        stl3ds.push(stl3d)
       }
     }
 
-    // let container, stats;
-
-    // let camera, cameraTarget, scene, renderer;
-
-    // init();
-    // animate();
-
-    // function init() {
-
-    //   container = document.getElementById('container')
-
-    //   camera = new THREE.PerspectiveCamera(35, window.innerWidth / window.innerHeight, 1, 15);
-    //   camera.position.set(3, 1.15, 4);
-
-    //   cameraTarget = new THREE.Vector3(0, -0.0, 0);
-
-    //   scene = new THREE.Scene();
-    //   scene.background = new THREE.Color(0xffffff);
-    //   scene.fog = new THREE.Fog(0xffffff, 2, 15);
-
-    //   // Ground
-
-    //   const planeGeometry = new THREE.PlaneGeometry(40, 40, 20, 20);
-    //   var planeMaterial = new THREE.LineBasicMaterial({ color: 0x111111 });
-    //   var plane = new THREE.Line(planeGeometry, planeMaterial);
-    //   // const planeMaterial = new THREE.MeshBasicMaterial({ color: 0x999999, side: THREE.DoubleSide });
-    //   // const plane = new THREE.Mesh(planeGeometry, planeMaterial);
-
-    //   // const positions = planeGeometry.attributes.position.array;
-    //   // for (let i = 0; i < positions.length; i += 3) {
-    //   //   positions[i] += Math.sin(i / 2) * 0.5;
-    //   //   positions[i + 1] += Math.cos(i / 4) * 0.5;
-    //   // }
-
-    //   plane.rotation.x = Math.PI / 2;
-    //   plane.position.set(-0.0, -0.0, 0);
-    //   scene.add(plane);
-
-    //   plane.receiveShadow = true;
-
-    //   // ASCII string
-    //   const loader = new STLLoader();
-    //   // 核心代码
-    //   // 如果是 stl 字符串，而不是文件，则是应使用 parse 函数加载模型，
-    //   // 加载成功后，调用 `scene.add()` 函数显示模型。
-    //   // 特别注意：此函数（`parse()`）是同步函数，所以会直接返回一个模型对象，
-    //   //          和 load 函数不同，load 函数是异步加载的，所以需要在回调函数里把模型显示出来。
-    //   var result = loader.parse(string)
-
-    //   const material = new THREE.MeshPhongMaterial({ color: 0x115599, specular: 0x111111, shininess: 200 });
-    //   const mesh = new THREE.Mesh(result, material);
-
-    //   mesh.position.set(0, 0, 0);
-    //   mesh.rotation.set(0, - Math.PI / 2, 0);
-    //   mesh.scale.set(0.5, 0.5, 0.5);
-
-    //   mesh.castShadow = true;
-    //   mesh.receiveShadow = true;
-
-    //   scene.add(mesh);
-
-    //   // Lights
-
-    //   scene.add(new THREE.HemisphereLight(0xffffff, 0xffffff));
-
-    //   // addShadowedLight(1, 1, 1, 0xffffff, 1.35);
-    //   addShadowedLight(0.5, 1, - 1, 0xffffff, 1);
-    //   // renderer
-
-    //   renderer = new THREE.WebGLRenderer({ antialias: true });
-    //   renderer.setPixelRatio(window.devicePixelRatio);
-    //   renderer.setSize(container.offsetWidth, container.offsetHeight);
-    //   renderer.outputEncoding = THREE.sRGBEncoding;
-
-    //   renderer.shadowMap.enabled = true;
-
-    //   var controls = new OrbitControls(camera, renderer.domElement);
-    //   controls.addEventListener('change', render2);
-
-    //   container.appendChild(renderer.domElement);
-
-    //   // stats
-    //   stats = new Stats();
-    //   stats.dom.style = 'position: absolute; top: 0; left: 0;'
-    //   container.appendChild(stats.dom);
-
-    //   // window resize
-
-    //   window.addEventListener('resize', onWindowResize);
-    // }
-
-    // function addShadowedLight(x, y, z, color, intensity) {
-    //   const directionalLight = new THREE.DirectionalLight(color, intensity);
-    //   directionalLight.position.set(x, y, z);
-    //   scene.add(directionalLight);
-
-    //   directionalLight.castShadow = true;
-
-    //   const d = 1;
-    //   directionalLight.shadow.camera.left = - d;
-    //   directionalLight.shadow.camera.right = d;
-    //   directionalLight.shadow.camera.top = d;
-    //   directionalLight.shadow.camera.bottom = - d;
-
-    //   directionalLight.shadow.camera.near = 1;
-    //   directionalLight.shadow.camera.far = 4;
-
-    //   directionalLight.shadow.bias = - 0.002;
-
-    // }
-
-    // function onWindowResize() {
-    //   camera.aspect = window.innerWidth / window.innerHeight;
-    //   camera.updateProjectionMatrix();
-
-    //   renderer.setSize(container.offsetWidth, container.offsetHeight);
-    // }
-
-    // function animate() {
-    //   if (controlChanged) return
-
-    //   requestAnimationFrame(animate);
-
-    //   render();
-    //   stats.update();
-    // }
-
-    // var controlChanged = false
-    // function render2() {
-    //   camera.lookAt(cameraTarget);
-
-    //   renderer.render(scene, camera);
-
-    //   stats.update();
-
-    //   controlChanged = true
-    // }
-
-    // function render() {
-    //   const timer = Date.now() * 0.0005;
-
-    //   camera.position.x = Math.cos(timer) * 3;
-    //   camera.position.z = Math.sin(timer) * 3;
-
-    //   camera.lookAt(cameraTarget);
-
-    //   renderer.render(scene, camera);
-
-    // }
+    window.addEventListener('resize', function () {
+      stl3ds.forEach(stl3d => {
+        stl3d.onWindowResize()
+      });
+    });
   </script>
 </body>
 
