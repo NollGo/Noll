@@ -74,12 +74,16 @@
   {{ template "HeaderTemplate" . }}
   <div class="clearfix">
     <h1 style="margin-bottom: 0.5rem;"> {{ .Data.Title }} </h1>
-    <div style="font-size: 1rem; display: flex; align-items: center;">
+    <div style="font-size: 1rem; align-items: center;" class="column">
       <img src="{{ .Viewer.AvatarURL }}" style="width: 1.4rem; height: 1.4rem;" />
       <a href="/">{{ .Viewer.ShowName }}</a>
       发布在<a href="/category/{{ .Data.Category.Name }}.html">{{ .Data.Category.Name }}</a>
-      于<time style="margin-left: 5px" title="{{ .Data.CreatedAt }}">
+      于<time style="margin-left: 5px;" class="flex-fill" title="{{ .Data.CreatedAt }}">
         {{ .Data.CreatedAt.Format "01-02-2006" }}</time>
+      {{ if .Data.UpvoteCount }}
+      <a style="margin-left: -10px" href="{{ $githubURL }}">
+        <span>{{ template "VoteSVGTemplate" 22 }}{{ .Data.UpvoteCount }}</span></a>
+      {{ end }}
     </div>
     <!-- <div id="container" style="width: 100%; height: 500px; position: relative;"></div> -->
   </div>
@@ -95,11 +99,6 @@
     {{ end }}
   </ul>
   <ul class="ul" style="text-align: center; margin: 30px auto;">
-    {{ if .Data.UpvoteCount }}
-    <li class="li reaction"><a href="{{ $githubURL }}">
-        <span>{{ template "VoteSVGTemplate" 26 }} {{ .Data.UpvoteCount }}</span></a>
-    </li>
-    {{ end }}
     <li class="li reaction">
       <a href="{{ $githubURL }}"><span class="SMILING"></span></a>
     </li>
