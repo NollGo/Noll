@@ -100,12 +100,19 @@ type EmbedFileReader struct {
 
 // ReadDir 读取 embed 打包里的文件夹
 func (r *EmbedFileReader) ReadDir(name string) ([]os.DirEntry, error) {
-	return r.DirEmbed.ReadDir(filepath.Join(r.DirPath, name))
+	return r.DirEmbed.ReadDir(r.Path(name))
 }
 
 // ReadFile 读取 embed 文件，并返回文件内容
 func (r *EmbedFileReader) ReadFile(name string) ([]byte, error) {
-	return r.DirEmbed.ReadFile(filepath.Join(r.DirPath, name))
+	return r.DirEmbed.ReadFile(r.Path(name))
+}
+
+// Path 返回当前目录下 name 文件的 embed 路径。
+// embed 路径，即 Linux 路径，Windows 的 `\` 路径 embed 不支持，
+// 所以需要对其进行替换。
+func (r *EmbedFileReader) Path(name string) string {
+	return strings.ReplaceAll(filepath.Join(r.DirPath, name), `\`, "/")
 }
 
 func render(data *GithubData, themeTmplDir string, debug bool, writer WriterFunc) error {
