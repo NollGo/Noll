@@ -15,6 +15,16 @@ jobs:
     - name: Check out code
       uses: actions/checkout@v1
 
+    - name: Setup GO
+      uses: actions/setup-go@v3
+      with:
+        go-version: '>=1.20.0'
+        cache: true
+
+    - name: Install gcc-aarch64-linux-gnu
+      run: |
+        sudo apt-get -y install gcc-aarch64-linux-gnu
+
     - name: Get service dependencies
       working-directory: ./
       run:  |
@@ -23,12 +33,6 @@ jobs:
             curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
             dep ensure
         fi
-
-    - name: Setup GO
-      uses: actions/setup-go@v3
-      with:
-        go-version: '>=1.20.0'
-        cache: true
 
     - name: Validates GO releaser config
       uses: docker://goreleaser/goreleaser:latest
