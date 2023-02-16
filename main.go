@@ -45,7 +45,9 @@ func main() {
 			fname := strings.ReplaceAll(s, ".gtpl", ".html")
 			htmlPath := filepath.Join(config.Pages, fname)
 			MkdirFileFolderIfNotExists(htmlPath)
-			fmt.Println(s, string(b), "\n=========================================")
+			if config.Debug {
+				fmt.Println(s, string(b), "\n=========================================")
+			}
 			return os.WriteFile(htmlPath, b, 0666)
 		})
 	}
