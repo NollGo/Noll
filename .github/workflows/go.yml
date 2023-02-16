@@ -24,6 +24,12 @@ jobs:
             dep ensure
         fi
 
+    - name: Setup GO
+      - uses: actions/setup-go@v3
+        with:
+          go-version: '>=1.20.0'
+          cache: true
+
     - name: Validates GO releaser config
       uses: docker://goreleaser/goreleaser:latest
       with:
@@ -32,6 +38,7 @@ jobs:
     - name: Create release on GitHub
       uses: docker://goreleaser/goreleaser:latest
       with:
-        args: release
+        version: latest
+        args: release --clean
       env:
         GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
