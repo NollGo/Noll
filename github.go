@@ -17,6 +17,8 @@ func getGemoji(gemoji string) string {
 }
 
 func getRepository(owner, name, token string) (*GithubData, error) {
+	fmt.Printf("Start get %v/%v repository\n", owner, name)
+
 	viewer, err := getViewer(token)
 	if err != nil {
 		return nil, err
@@ -212,6 +214,7 @@ func getCategories(owner, name, token string) (*CategoryPage, error) {
 			discussionCategories(first: 100) {
 				nodes {
 					name
+					slug
 					emoji
 					emojiHTML
 					description

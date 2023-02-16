@@ -42,6 +42,7 @@ type Category struct {
 	Emoji       string          `json:"emoji"`
 	EmojiHTML   string          `json:"emojiHTML"`
 	Name        string          `json:"name"`
+	Slug        string          `json:"slug"`
 	Description string          `json:"description"`
 	CreatedAt   time.Time       `json:"createdAt"`
 	UpdatedAt   time.Time       `json:"updatedAt"`
