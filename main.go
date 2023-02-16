@@ -12,11 +12,12 @@ import (
 
 // Config is gd2b config
 type Config struct {
-	Owner string `flag:"Github repository owner"`
-	Name  string `flag:"Github repository name"`
-	Token string `flag:"Github authorization token (see https://docs.github.com/zh/graphql/guides/forming-calls-with-graphql)"`
-	Pages string `flag:"Your github pages repository name, If None, defaults to the repository where the discussion resides"`
-	Debug bool   `flag:"Debug mode if true"`
+	Owner   string `flag:"Github repository owner"`
+	Name    string `flag:"Github repository name"`
+	Token   string `flag:"Github authorization token (see https://docs.github.com/zh/graphql/guides/forming-calls-with-graphql)"`
+	Pages   string `flag:"Your github pages repository name, If None, defaults to the repository where the discussion resides"`
+	Debug   bool   `flag:"Debug mode if true"`
+	BaseURL string `flag:"Web site base url"`
 }
 
 func main() {
@@ -41,7 +42,7 @@ func main() {
 	}
 
 	_render := func() error {
-		return render(githubData, "assets/theme", config.Debug, func(s string, b []byte) error {
+		return render(&RenderSite{BaseURL: config.BaseURL}, githubData, "assets/theme", config.Debug, func(s string, b []byte) error {
 			fname := strings.ReplaceAll(s, ".gtpl", ".html")
 			htmlPath := filepath.Join(config.Pages, fname)
 			MkdirFileFolderIfNotExists(htmlPath)

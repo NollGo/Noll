@@ -14,10 +14,16 @@ import (
 
 // RenderData 渲染模板的结构体
 type RenderData struct {
+	Site       *RenderSite
 	Viewer     *User
 	Labels     *LabelPage
 	Categories *CategoryPage
 	Data       interface{}
+}
+
+// RenderSite 渲染的站点信息
+type RenderSite struct {
+	BaseURL string
 }
 
 // JsRenderLoader js 渲染加载器
@@ -115,7 +121,7 @@ func EmbedPath(path string) string {
 	return strings.ReplaceAll(path, `\`, "/")
 }
 
-func render(data *GithubData, themeTmplDir string, debug bool, writer WriterFunc) error {
+func render(site *RenderSite, data *GithubData, themeTmplDir string, debug bool, writer WriterFunc) error {
 	// 1. 获取全局资源（assets 文件夹）文件
 	readGlobalFile := func(name string) ([]byte, error) {
 		var fname = filepath.Join("assets", name)
@@ -123,6 +129,14 @@ func render(data *GithubData, themeTmplDir string, debug bool, writer WriterFunc
 			return assets.Dir.ReadFile(EmbedPath(name))
 		}
 		return os.ReadFile(fname)
+	}
+
+	readGlobalGtpl := func(name string) (*template.Template, error) {
+		bs, err := readGlobalFile(name)
+		if err != nil {
+			return nil, err
+		}
+		return template.New(name).Parse(string(bs))
 	}
 
 	var r FileReader
@@ -151,11 +165,7 @@ func render(data *GithubData, themeTmplDir string, debug bool, writer WriterFunc
 		return err
 	}
 
-	jsRenderLoaderBS, err := readGlobalFile("js-render-loader.gtpl")
-	if err != nil {
-		return err
-	}
-	jsRenderTemplate, err := template.New("jsRenderLoader").Parse(string(jsRenderLoaderBS))
+	jsRenderTemplate, err := readGlobalGtpl("js-render-loader.gtpl")
 	if err != nil {
 		return err
 	}
@@ -170,6 +180,7 @@ func render(data *GithubData, themeTmplDir string, debug bool, writer WriterFunc
 	stringWriter := &StringWriter{}
 	indexTemplate := themeTemplate.Lookup("index.gtpl")
 	_data := &RenderData{
+		Site:       site,
 		Viewer:     data.Viewer,
 		Labels:     data.Repository.Labels,
 		Categories: data.Repository.Categories,
@@ -253,16 +264,24 @@ func render(data *GithubData, themeTmplDir string, debug bool, writer WriterFunc
 		start = end
 	}
 
+	globalTemplate, err := readGlobalGtpl("global.gtpl")
+	if err != nil {
+		return err
+	}
+	globalTemplate.Execute(stringWriter.Reset(), &site)
+	globalHTML := stringWriter.String()
+
 	// 5. 全局渲染，比如调试模式
 	bs, err := readGlobalFile("debug.tmpl.gtpl")
 	for name, page := range htmlPages {
 		// 6. 输出到目标文件夹
+		pageHTML := page + "\n\n" + globalHTML
 		if debug {
-			if err = writer(name, []byte(page+"\n\n"+string(bs))); err != nil {
+			if err = writer(name, []byte(pageHTML+"\n\n"+string(bs))); err != nil {
 				return err
 			}
 		} else {
-			if err = writer(name, []byte(page)); err != nil {
+			if err = writer(name, []byte(pageHTML)); err != nil {
 				return err
 			}
 		}
