@@ -100,19 +100,19 @@ type EmbedFileReader struct {
 
 // ReadDir 读取 embed 打包里的文件夹
 func (r *EmbedFileReader) ReadDir(name string) ([]os.DirEntry, error) {
-	return r.DirEmbed.ReadDir(r.Path(name))
+	return r.DirEmbed.ReadDir(EmbedPath(filepath.Join(r.DirPath, name)))
 }
 
 // ReadFile 读取 embed 文件，并返回文件内容
 func (r *EmbedFileReader) ReadFile(name string) ([]byte, error) {
-	return r.DirEmbed.ReadFile(r.Path(name))
+	return r.DirEmbed.ReadFile(EmbedPath(filepath.Join(r.DirPath, name)))
 }
 
-// Path 返回当前目录下 name 文件的 embed 路径。
+// EmbedPath 返回当前目录下 name 文件的 embed 路径。
 // embed 路径，即 Linux 路径，Windows 的 `\` 路径 embed 不支持，
 // 所以需要对其进行替换。
-func (r *EmbedFileReader) Path(name string) string {
-	return strings.ReplaceAll(filepath.Join(r.DirPath, name), `\`, "/")
+func EmbedPath(path string) string {
+	return strings.ReplaceAll(path, `\`, "/")
 }
 
 func render(data *GithubData, themeTmplDir string, debug bool, writer WriterFunc) error {
@@ -120,7 +120,7 @@ func render(data *GithubData, themeTmplDir string, debug bool, writer WriterFunc
 	readGlobalFile := func(name string) ([]byte, error) {
 		var fname = filepath.Join("assets", name)
 		if _, err := os.Stat(fname); err != nil {
-			return assets.Dir.ReadFile(fname)
+			return assets.Dir.ReadFile(EmbedPath(name))
 		}
 		return os.ReadFile(fname)
 	}
