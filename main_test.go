@@ -6,7 +6,45 @@ import (
 	"strings"
 	"testing"
 	"time"
+
+	"github.com/gosimple/slug"
 )
+
+func TestURLSlug(t *testing.T) {
+	text := slug.Make("Hellö Wörld хелло ворлд")
+	fmt.Println(text) // Will print: "hello-world-khello-vorld"
+
+	text2 := slug.Make("o(*￣▽￣*)ブ")
+	fmt.Println(text2) // Will print: "o-v-bu"
+
+	text3 := slug.Make("💡 (_　_)。゜zｚＺ")
+	fmt.Println(text3) // Will print: "zzz"
+
+	text4 := slug.Make("( ´･･)ﾉ(._.`)")
+	fmt.Println(text4) // Will print: "no"
+
+	text5 := slug.Make("ヾ(⌐■_■)ノ♪")
+	fmt.Println(text5) // Will print: "no"
+
+	someText := slug.Make("影師")
+	fmt.Println(someText) // Will print: "ying-shi"
+
+	enText := slug.MakeLang("This & that", "en")
+	fmt.Println(enText) // Will print: "this-and-that"
+
+	deText := slug.MakeLang("Diese & Dass", "de")
+	fmt.Println(deText) // Will print: "diese-und-dass"
+
+	slug.Lowercase = false // Keep uppercase characters
+	deUppercaseText := slug.MakeLang("Diese & Dass", "fa")
+	fmt.Println(deUppercaseText) // Will print: "Diese-und-Dass"
+
+	slug.CustomSub = map[string]string{
+		"water": "sand",
+	}
+	textSub := slug.Make("water is hot")
+	fmt.Println(textSub) // Will print: "sand-is-hot"
+}
 
 func TestStringContains(t *testing.T) {
 	if strings.Contains(`{
@@ -64,6 +102,7 @@ func TestQueryf(t *testing.T) {
 
 func TestRender(t *testing.T) {
 	err := render(
+		&RenderSite{"/"},
 		testRepository(),
 		"assets/theme",
 		true,
