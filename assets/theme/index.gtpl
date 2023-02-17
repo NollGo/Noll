@@ -9,8 +9,8 @@
 <body>
   {{ if .Data }}
   {{ template "HeaderTemplate" . }}
-  <div class="column">
-    <div class="flex-fill">
+  <div class="clearfix">
+    <div>
       <h1>近期文章</h1>
       {{ template "DiscussionGroup2Template" .Data }}
       <ul class="ul" style="margin-left: -10px;">

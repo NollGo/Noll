@@ -7,17 +7,12 @@
 </head>
 
 <body>
-  <style>
-    .flex-fill:not(:last-of-type) {
-      margin-right: 20px;
-    }
-  </style>
   {{ template "HeaderTemplate" . }}
   {{ if .Labels.TotalCount }}
-  <div class="column">
+  <div class="clearfix">
     {{ range $label := .Labels.Nodes }}
     {{ if $label.Discussions.TotalCount }}
-    <div class="flex-fill" {{ template "ColorStyleTemplate" $label.Color }}>
+    <div {{ template "ColorStyleTemplate" $label.Color }}>
       <h1>#{{ $label.Name }} ({{ $label.Discussions.TotalCount }})</h1>
       {{ template "DiscussionGroup2Template" $label.Discussions }}
       <ul class="ul" style="margin-left: -10px;">

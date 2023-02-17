@@ -2,7 +2,7 @@
 <header>
 <ul class="ul" style="margin-left: -10px;">
   <li class="li"><a href='{{ url "/" }}'>
-      <h4 style="display: contents;">🏠 首页</h4>
+      <h3 style="display: contents;">{{ .Viewer.ShowName }}'s Blog</h3>
     </a></li>
   <li class="li"><a href='{{ url "Archive" }}'>
       <h4 style="display: contents;">🗂️ 归档</h4>

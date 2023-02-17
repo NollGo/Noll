@@ -9,10 +9,10 @@
 <body>
   {{ template "HeaderTemplate" . }}
   {{ if .Categories.TotalCount }}
-  <div class="column">
+  <div class="clearfix">
     {{ range $category := .Categories.Nodes }}
     {{ if $category.Discussions.TotalCount }}
-    <div class="flex-fill">
+    <div>
       <h1>{{ $category.EmojiHTML }} {{ $category.Name }} ({{ $category.Discussions.TotalCount }})</h1>
       {{ template "DiscussionGroup2Template" $category.Discussions }}
       <ul class="ul" style="margin-left: -10px;">
