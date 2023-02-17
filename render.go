@@ -24,6 +24,7 @@ type RenderData struct {
 // RenderSite 渲染的站点信息
 type RenderSite struct {
 	BaseURL string
+	GamID   string
 }
 
 // JsRenderLoader js 渲染加载器
