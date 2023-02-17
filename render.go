@@ -188,17 +188,17 @@ func render(site *RenderSite, data *GithubData, themeTmplDir string, debug bool,
 			return site.BaseURL
 		},
 		// 带有页号的链接
-		"url2": func(obj interface{}, number int) string {
+		"url2": func(obj interface{}, number interface{}) string {
 			if _, ok := obj.(*LabelPage); ok {
-				// 归档分页
+				// 标签文章列表分页
 				return UnixPath(filepath.Join(site.BaseURL, "label", fmt.Sprintf("%v.html", number)))
 			}
 			if _, ok := obj.(*CategoryPage); ok {
-				// 归档分页
+				// 类别文章列表分页
 				return UnixPath(filepath.Join(site.BaseURL, "category", fmt.Sprintf("%v.html", number)))
 			}
 			if _, ok := obj.(*DiscussionPage); ok {
-				// 归档分页
+				// 归档文章列表分页
 				return UnixPath(filepath.Join(site.BaseURL, "archive", fmt.Sprintf("%v.html", number)))
 			}
 			return site.BaseURL

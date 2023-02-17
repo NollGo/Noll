@@ -1,5 +1,5 @@
 {{define "CategoryItemTemplate"}}
-<a href="/category/{{ .Name }}.html">
+<a href="{{ url . }}">
   <span>{{ .EmojiHTML }} {{ .Name }}</span>
   {{ if .Discussions }}
   ({{ .Discussions.TotalCount }})

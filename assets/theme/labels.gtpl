@@ -22,7 +22,7 @@
       {{ template "DiscussionGroup2Template" $label.Discussions }}
       <ul class="ul" style="margin-left: -10px;">
         <li class="li">
-          <a href="/label/{{ $label.Name }}.html">更多文章 >>></a>
+          <a href="{{ url $label }}">更多文章 >>></a>
         </li>
       </ul>
     </div>

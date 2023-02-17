@@ -17,7 +17,7 @@
       {{ template "DiscussionGroup2Template" $category.Discussions }}
       <ul class="ul" style="margin-left: -10px;">
         <li class="li">
-          <a href="/category/{{ $category.Name }}.html">更多文章 >>></a>
+          <a href="{{ url $category }}">更多文章 >>></a>
         </li>
       </ul>
     </div>

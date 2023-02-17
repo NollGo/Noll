@@ -15,7 +15,7 @@
       {{ template "DiscussionGroup2Template" .Data }}
       <ul class="ul" style="margin-left: -10px;">
         <li class="li">
-          <a href="/archive/1.html">更多文章 >>></a>
+          <a href='{{ url "Archive" }}'>更多文章 >>></a>
         </li>
       </ul>
     </div>

@@ -76,8 +76,8 @@
     <h1 style="margin-bottom: 0.5rem;"> {{ .Data.Title }} </h1>
     <div style="font-size: 1rem; align-items: center;" class="column">
       <img src="{{ .Viewer.AvatarURL }}" style="width: 1.4rem; height: 1.4rem;" />
-      <a href="/">{{ .Viewer.ShowName }}</a>
-      发布在<a href="/category/{{ .Data.Category.Name }}.html">{{ .Data.Category.Name }}</a>
+      <a href='{{ url "/" }}'>{{ .Viewer.ShowName }}</a>
+      发布在<a href="{{ url .Data.Category}}">{{ .Data.Category.Name }}</a>
       于<time style="margin-left: 5px;" class="flex-fill" title="{{ .Data.CreatedAt }}">
         {{ .Data.CreatedAt.Format "01-02-2006" }}</time>
       {{ if .Data.UpvoteCount }}

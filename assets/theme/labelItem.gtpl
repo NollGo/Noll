@@ -1,5 +1,5 @@
 {{define "LabelItemTemplate"}}
-<a href="/label/{{ .Name }}.html" {{ template "ColorStyleTemplate" .Color }}>
+<a href="{{ url . }}" {{ template "ColorStyleTemplate" .Color }}>
   <span>#{{ .Name }}</span>
   {{ if .Discussions }}
   ({{ .Discussions.TotalCount }})

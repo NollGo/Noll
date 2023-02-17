@@ -1,6 +1,6 @@
 {{define "DiscussionItemTemplate"}}
 <li style="display: block; margin: 5px 0;">
-  <a href="/post/{{ .Number }}.html">
+  <a href="{{ url . }}">
     {{ .Title }}
     <ul style="display: contents; font-size: 1rem;">
       <li class="li"><span class="COMMENT">
