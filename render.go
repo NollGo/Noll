@@ -106,19 +106,19 @@ type EmbedFileReader struct {
 
 // ReadDir 读取 embed 打包里的文件夹
 func (r *EmbedFileReader) ReadDir(name string) ([]os.DirEntry, error) {
-	return r.DirEmbed.ReadDir(EmbedPath(filepath.Join(r.DirPath, name)))
+	return r.DirEmbed.ReadDir(UnixPath(filepath.Join(r.DirPath, name)))
 }
 
 // ReadFile 读取 embed 文件，并返回文件内容
 func (r *EmbedFileReader) ReadFile(name string) ([]byte, error) {
-	return r.DirEmbed.ReadFile(EmbedPath(filepath.Join(r.DirPath, name)))
+	return r.DirEmbed.ReadFile(UnixPath(filepath.Join(r.DirPath, name)))
 }
 
-// EmbedPath 返回当前目录下 name 文件的 embed 路径。
+// UnixPath 返回当前目录下 name 文件的 unix 路径。
 // embed 路径，即 Linux 路径，Windows 的 `\` 路径 embed 不支持，
 // 所以需要对其进行替换。
-func EmbedPath(path string) string {
-	return strings.ReplaceAll(path, `\`, "/")
+func UnixPath(path string) string {
+	return strings.ReplaceAll(filepath.Clean(path), `\`, "/")
 }
 
 func render(site *RenderSite, data *GithubData, themeTmplDir string, debug bool, writer WriterFunc) error {
@@ -126,7 +126,7 @@ func render(site *RenderSite, data *GithubData, themeTmplDir string, debug bool,
 	readGlobalFile := func(name string) ([]byte, error) {
 		var fname = filepath.Join("assets", name)
 		if _, err := os.Stat(fname); err != nil {
-			return assets.Dir.ReadFile(EmbedPath(name))
+			return assets.Dir.ReadFile(UnixPath(name))
 		}
 		return os.ReadFile(fname)
 	}
@@ -157,6 +157,51 @@ func render(site *RenderSite, data *GithubData, themeTmplDir string, debug bool,
 		},
 		"isy": func(d1, d2 time.Time) bool {
 			return d1.Year() == d2.Year()
+		},
+		"url": func(obj interface{}) string {
+			if path, ok := obj.(string); ok {
+				switch path {
+				case "Index":
+					path = "/"
+				case "Archive":
+					path = "archive/1.html"
+				case "Categories":
+					path = "categories.html"
+				case "Labels":
+					path = "labels.html"
+				case "About":
+					path = "about.html"
+				case "RSS":
+					path = "rss.xml"
+				}
+				return UnixPath(filepath.Join(site.BaseURL, path))
+			}
+			if label, ok := obj.(*Label); ok {
+				return UnixPath(filepath.Join(site.BaseURL, "label", fmt.Sprintf("%v.html", label.Name)))
+			}
+			if category, ok := obj.(*Category); ok {
+				return UnixPath(filepath.Join(site.BaseURL, "category", fmt.Sprintf("%v.html", category.Name)))
+			}
+			if discussion, ok := obj.(*Discussion); ok {
+				return UnixPath(filepath.Join(site.BaseURL, "post", fmt.Sprintf("%v.html", discussion.Number)))
+			}
+			return site.BaseURL
+		},
+		// 带有页号的链接
+		"url2": func(obj interface{}, number int) string {
+			if _, ok := obj.(*LabelPage); ok {
+				// 归档分页
+				return UnixPath(filepath.Join(site.BaseURL, "label", fmt.Sprintf("%v.html", number)))
+			}
+			if _, ok := obj.(*CategoryPage); ok {
+				// 归档分页
+				return UnixPath(filepath.Join(site.BaseURL, "category", fmt.Sprintf("%v.html", number)))
+			}
+			if _, ok := obj.(*DiscussionPage); ok {
+				// 归档分页
+				return UnixPath(filepath.Join(site.BaseURL, "archive", fmt.Sprintf("%v.html", number)))
+			}
+			return site.BaseURL
 		},
 	}
 	themeTemplate, err := readTemplates(
