@@ -63,8 +63,12 @@ func main() {
 
 	if config.Debug {
 		port := ":20000"
+		fs := &DirWithError{
+			FS:     http.Dir(config.Pages),
+			Status: map[int]string{http.StatusNotFound: "404.html"},
+		}
 		fmt.Println("Start toPages debug mode in port", port)
-		http.Handle("/", http.StripPrefix("/", http.FileServer(http.Dir(config.Pages))))
+		http.Handle("/", http.StripPrefix("/", http.FileServer(fs)))
 		// 重新编译渲染接口
 		// 调试使用
 		http.Handle("/build", http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -99,4 +103,37 @@ func main() {
 		}))
 		http.ListenAndServe(port, nil)
 	}
+}
+
+// DirWithError 带有错误状态页面的 http 文件系统
+type DirWithError struct {
+	FS     http.FileSystem
+	Status map[int]string
+}
+
+// Open 返回指定名称（路径）的文件
+func (d *DirWithError) Open(name string) (http.File, error) {
+	f, err := d.FS.Open(name)
+	if err != nil {
+		if os.IsNotExist(err) {
+			_404, ok := d.Status[http.StatusNotFound]
+			if ok {
+				return d.FS.Open(_404)
+			}
+		} else if os.IsPermission(err) {
+			_403, ok := d.Status[http.StatusForbidden]
+			if ok {
+				return d.FS.Open(_403)
+			}
+		} else {
+			// Default:
+			_500, ok := d.Status[http.StatusInternalServerError]
+			if ok {
+				return d.FS.Open(_500)
+			}
+		}
+		return f, err
+	}
+
+	return f, nil
 }

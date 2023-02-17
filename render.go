@@ -236,6 +236,12 @@ func render(site *RenderSite, data *GithubData, themeTmplDir string, debug bool,
 	}
 	htmlPages[indexTemplate.Name()] = stringWriter.String()
 
+	notFoundTemplate := themeTemplate.Lookup("404.gtpl")
+	if err = notFoundTemplate.Execute(stringWriter.Reset(), _data); err != nil {
+		return err
+	}
+	htmlPages[notFoundTemplate.Name()] = stringWriter.String()
+
 	categoriesTemplate := themeTemplate.Lookup("categories.gtpl")
 	if err = categoriesTemplate.Execute(stringWriter.Reset(), _data); err != nil {
 		return err
