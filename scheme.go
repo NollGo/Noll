@@ -13,7 +13,7 @@ type Body struct {
 // GithubData is Github GraphQL api data
 type GithubData struct {
 	Repository *Repository `json:"repository"`
-	Viewer     *User       `json:"viewer"`
+	Viewer     *User       `json:"user"`
 }
 
 // PageInfo is Github GraphQL api page data info

@@ -19,7 +19,7 @@ func getGemoji(gemoji string) string {
 func getRepository(owner, name, token string) (*GithubData, error) {
 	fmt.Printf("Start get %v/%v repository\n", owner, name)
 
-	viewer, err := getViewer(token)
+	viewer, err := getViewer(owner, token)
 	if err != nil {
 		return nil, err
 	}
@@ -252,9 +252,9 @@ func getLabels(owner, name, token string) (*LabelPage, error) {
 	return result.Data.Repository.Labels, nil
 }
 
-func getViewer(token string) (*User, error) {
+func getViewer(owner, token string) (*User, error) {
 	queryFormat := `{
-		viewer {
+		user(login: "%v") {
 			login
 			url
 			avatarUrl
@@ -267,7 +267,7 @@ func getViewer(token string) (*User, error) {
 		}
 	}`
 	var result Body
-	if err := query(queryFormat, token, &result); err != nil {
+	if err := query(fmt.Sprintf(queryFormat, owner), token, &result); err != nil {
 		return nil, err
 	}
 	return result.Data.Viewer, nil
