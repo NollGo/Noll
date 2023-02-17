@@ -18,6 +18,7 @@ type Config struct {
 	Pages   string `flag:"Your github pages repository name, If None, defaults to the repository where the discussion resides"`
 	Debug   bool   `flag:"Debug mode if true"`
 	BaseURL string `flag:"Web site base url"`
+	GamID   string `flag:"Google Analytics Measurement id, Defaults to empty to not load the Google Analytics script"`
 }
 
 func main() {
@@ -42,15 +43,22 @@ func main() {
 	}
 
 	_render := func() error {
-		return render(&RenderSite{BaseURL: config.BaseURL}, githubData, "assets/theme", config.Debug, func(s string, b []byte) error {
-			fname := strings.ReplaceAll(s, ".gtpl", ".html")
-			htmlPath := filepath.Join(config.Pages, fname)
-			MkdirFileFolderIfNotExists(htmlPath)
-			if config.Debug {
-				fmt.Println(s, string(b), "\n=========================================")
-			}
-			return os.WriteFile(htmlPath, b, 0666)
-		})
+		return render(
+			&RenderSite{
+				BaseURL: config.BaseURL,
+				GamID:   config.GamID,
+			},
+			githubData, "assets/theme",
+			config.Debug,
+			func(s string, b []byte) error {
+				fname := strings.ReplaceAll(s, ".gtpl", ".html")
+				htmlPath := filepath.Join(config.Pages, fname)
+				MkdirFileFolderIfNotExists(htmlPath)
+				if config.Debug {
+					fmt.Println(s, string(b), "\n=========================================")
+				}
+				return os.WriteFile(htmlPath, b, 0666)
+			})
 	}
 	if err = _getGithubData(); err != nil {
 		panic(err)
