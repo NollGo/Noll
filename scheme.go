@@ -1,6 +1,7 @@
 package main
 
 import (
+	"regexp"
 	"time"
 )
 
@@ -42,11 +43,18 @@ type Category struct {
 	Emoji       string          `json:"emoji"`
 	EmojiHTML   string          `json:"emojiHTML"`
 	Name        string          `json:"name"`
-	Slug        string          `json:"slug"`
 	Description string          `json:"description"`
 	CreatedAt   time.Time       `json:"createdAt"`
 	UpdatedAt   time.Time       `json:"updatedAt"`
 	Discussions *DiscussionPage `json:"-"`
+}
+
+// InvaildFileNameRegex 无效的文件名字符正则表达式
+var InvaildFileNameRegex = regexp.MustCompile(`[<>:"/\\|?*\x00-\x1f]`)
+
+// Slug 返回分类的合法的 url 名称，将其中无效的文件名替换为 '-'
+func (c *Category) Slug() string {
+	return InvaildFileNameRegex.ReplaceAllString(c.Name, "-")
 }
 
 // LabelPage is Github discussion label page scheme
@@ -63,6 +71,11 @@ type Label struct {
 	CreatedAt   time.Time       `json:"createdAt"`
 	UpdatedAt   time.Time       `json:"updatedAt"`
 	Discussions *DiscussionPage `json:"-"`
+}
+
+// Slug 返回标签的合法的 url 名称，将其中无效的文件名替换为 '-'
+func (l *Label) Slug() string {
+	return InvaildFileNameRegex.ReplaceAllString(l.Name, "-")
 }
 
 // DiscussionPage is Github Discussion page scheme

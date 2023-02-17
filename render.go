@@ -177,10 +177,10 @@ func render(site *RenderSite, data *GithubData, themeTmplDir string, debug bool,
 				return UnixPath(filepath.Join(site.BaseURL, path))
 			}
 			if label, ok := obj.(*Label); ok {
-				return UnixPath(filepath.Join(site.BaseURL, "label", fmt.Sprintf("%v.html", label.Name)))
+				return UnixPath(filepath.Join(site.BaseURL, "label", fmt.Sprintf("%v.html", label.Slug())))
 			}
 			if category, ok := obj.(*Category); ok {
-				return UnixPath(filepath.Join(site.BaseURL, "category", fmt.Sprintf("%v.html", category.Name)))
+				return UnixPath(filepath.Join(site.BaseURL, "category", fmt.Sprintf("%v.html", category.Slug())))
 			}
 			if discussion, ok := obj.(*Discussion); ok {
 				return UnixPath(filepath.Join(site.BaseURL, "post", fmt.Sprintf("%v.html", discussion.Number)))
@@ -260,7 +260,7 @@ func render(site *RenderSite, data *GithubData, themeTmplDir string, debug bool,
 		if err = categoryTemplate.Execute(stringWriter.Reset(), _data); err != nil {
 			return err
 		}
-		htmlPages[fmt.Sprintf(`category/%v.gtpl`, category.Name)] = stringWriter.String()
+		htmlPages[fmt.Sprintf(`category/%v.gtpl`, category.Slug())] = stringWriter.String()
 	}
 
 	labelTemplate := themeTemplate.Lookup("label.gtpl")
@@ -269,7 +269,7 @@ func render(site *RenderSite, data *GithubData, themeTmplDir string, debug bool,
 		if err = labelTemplate.Execute(stringWriter.Reset(), _data); err != nil {
 			return err
 		}
-		htmlPages[fmt.Sprintf(`label/%v.gtpl`, label.Name)] = stringWriter.String()
+		htmlPages[fmt.Sprintf(`label/%v.gtpl`, label.Slug())] = stringWriter.String()
 	}
 
 	postTemplate := themeTemplate.Lookup("post.gtpl")
