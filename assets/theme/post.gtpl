@@ -111,6 +111,7 @@
     {{ end }}
     {{ end }}
   </ul>
+  {{ template "TopComponentTemplate" }}
   <div style="display: flex; align-items: center; margin: 30px auto;">
     <div style="flex: 1; height: 1px; background-color: #ddd;"></div>
     <span class="COMMENT" style="margin: 0 12px"></span>
