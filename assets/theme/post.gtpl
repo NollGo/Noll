@@ -125,7 +125,7 @@
     {{ end }}
   </ul>
   {{ end }}
-  <a href="{{ $githubURL }}#reply" class="comment-input">前往 GitHub Discussion 评论</a>
+  <a href="{{ $githubURL }}#issue-comment-box" class="comment-input">前往 GitHub Discussion 评论</a>
   {{ template "footerTemplate" .Viewer }}
 </body>
 
