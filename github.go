@@ -253,6 +253,8 @@ func getLabels(owner, name, token string) (*LabelPage, error) {
 }
 
 func getViewer(owner, token string) (*User, error) {
+	// 查询该账号是否为一名用户。
+	// 需要 `read:user`, `read:mail` 权限。
 	queryFormat := `{
 		user(login: "%v") {
 			login
@@ -267,10 +269,44 @@ func getViewer(owner, token string) (*User, error) {
 		}
 	}`
 	var result Body
-	if err := query(fmt.Sprintf(queryFormat, owner), token, &result); err != nil {
-		return nil, err
+	err := query(fmt.Sprintf(queryFormat, owner), token, &result)
+	if result.Data.Viewer != nil {
+		return result.Data.Viewer, nil
 	}
-	return result.Data.Viewer, nil
+	// 如果该账号不是一名用户，则查询是否为一个组织。
+	// 需要 `read:org` 权限。
+	queryFormat = `{
+		organization(login: "%v") {
+			email
+			location
+			login
+			name
+			description
+			url
+			avatarUrl
+			twitterUsername
+		}
+	}`
+	err1 := query(fmt.Sprintf(queryFormat, owner), token, &result)
+	if result.Data.Organization != nil {
+		return &User{
+			Login:     result.Data.Organization.Login,
+			Name:      result.Data.Organization.Name,
+			Email:     result.Data.Organization.Email,
+			Location:  result.Data.Organization.Location,
+			AvatarURL: result.Data.Organization.AvatarURL,
+			Bio:       result.Data.Organization.Bio,
+			GitHubURL: result.Data.Organization.GitHubURL,
+			Twitter:   result.Data.Organization.Twitter,
+		}, nil
+	}
+
+	if err == nil && err1 == nil {
+		// 如果没有异常，也没有返回任何账号信息，则表示该账号不存在。
+		return nil, fmt.Errorf("This account does not exist")
+	}
+
+	return nil, fmt.Errorf("%v\n%v", err, err1)
 }
 
 func query(body string, token string, result *Body) error {

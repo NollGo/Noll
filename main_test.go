@@ -102,7 +102,7 @@ func TestQueryf(t *testing.T) {
 
 func TestRender(t *testing.T) {
 	err := render(
-		&RenderSite{"/"},
+		&RenderSite{"/", ""},
 		testRepository(),
 		"assets/theme",
 		true,
@@ -157,5 +157,6 @@ func testRepository() *GithubData {
 	return &GithubData{
 		&Repository{Labels: labels, Categories: categories, Discussions: discussions},
 		&User{Login: "excing"},
+		&Organization{},
 	}
 }

@@ -12,8 +12,9 @@ type Body struct {
 
 // GithubData is Github GraphQL api data
 type GithubData struct {
-	Repository *Repository `json:"repository"`
-	Viewer     *User       `json:"user"`
+	Repository   *Repository   `json:"repository"`
+	Viewer       *User         `json:"user"`
+	Organization *Organization `json:"organization"`
 }
 
 // PageInfo is Github GraphQL api page data info
@@ -153,4 +154,16 @@ func (u *User) ShowName() string {
 		return u.Name
 	}
 	return u.Login
+}
+
+// Organization is Github organization scheme
+type Organization struct {
+	Login     string `json:"login"`
+	AvatarURL string `json:"avatarUrl"`
+	GitHubURL string `json:"url"`
+	Bio       string `json:"description"`
+	Email     string `json:"email"`
+	Location  string `json:"location"`
+	Name      string `json:"name"`
+	Twitter   string `json:"twitterUsername"`
 }
