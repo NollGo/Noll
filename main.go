@@ -30,6 +30,9 @@ func main() {
 		config.Pages = config.Name
 	}
 
+	pageDomain := fmt.Sprintf("%v.github.io", config.Owner)
+	config.BaseURL = UnixPath(strings.ReplaceAll(config.BaseURL, pageDomain, "/"))
+
 	var err error
 	if _, err = os.Stat(config.Pages); os.IsNotExist(err) {
 		os.MkdirAll(config.Pages, os.ModePerm)
