@@ -26,6 +26,8 @@ func main() {
 	goflag.Var(&config)
 	goflag.Parse("config", "Configuration file path.")
 
+	fmt.Println("Start build noll siteweb")
+
 	if config.Pages == "" {
 		config.Pages = config.Name
 	}
@@ -70,7 +72,7 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Println("Start toPages package finished")
+	fmt.Println("Build noll siteweb finished")
 
 	if config.Debug {
 		port := ":20000"
@@ -78,7 +80,7 @@ func main() {
 			FS:     http.Dir(config.Pages),
 			Status: map[int]string{http.StatusNotFound: "404.html"},
 		}
-		fmt.Println("Start toPages debug mode in port", port)
+		fmt.Println("Start noll debug mode in port", port)
 		http.Handle("/", http.StripPrefix("/", http.FileServer(fs)))
 		// 重新编译渲染接口
 		// 调试使用

@@ -206,7 +206,7 @@ func render(site *RenderSite, data *GithubData, themeTmplDir string, debug bool,
 		},
 	}
 	themeTemplate, err := readTemplates(
-		template.New("__ToPagesTemplate__").Funcs(templateFuncMap), r, ".")
+		template.New("__nollTemplate__").Funcs(templateFuncMap), r, ".")
 	if err != nil {
 		return err
 	}
