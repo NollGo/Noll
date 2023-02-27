@@ -50,7 +50,7 @@ jobs:
             baseURL="/$repositoryName"
             gamID="${{ vars.GAMID }}"
             echo "${{ github.repository_owner }}, $repositoryName, ${{secrets.GITHUB_TOKEN}}, $pagesPath, $baseURL, $gamID,"
-            ./Noll/io.github.nollgo -owner ${{ github.repository_owner }} -name $repositoryName  -token ${{secrets.GITHUB_TOKEN}} -pages $pagesPath -baseURL $baseURL -gamID $gamID
+            ./Noll/io.github.nollgo -owner ${{ github.repository_owner }} -name $repositoryName  -token ${{secrets.GITHUB_TOKEN}} -pages "$pagesPath" -baseURL "$baseURL" -gamID "$gamID"
             rm -rf ./Noll
             ls -a -lh
       - name: Upload artifact
