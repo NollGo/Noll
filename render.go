@@ -9,7 +9,7 @@ import (
 	"text/template"
 	"time"
 
-	"io.github.topages/assets"
+	"io.github.nollgo/assets"
 )
 
 // RenderData 渲染模板的结构体
