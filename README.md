@@ -16,13 +16,13 @@ Noll 适用于任何类型的网站，包括博客、问答和文档。使用 No
 
 # 快速使用
 
-只需 Fork [NollAction](https://github.com/NollGo/NollAction) 项目，并开启 Discussions 和 Pages 功能，即可立即开始体验 Noll，有关详细说明，请查看[此文章](https://nollgo.github.io/noll/post/29.html)。
+只需 Fork [NollAction](https://github.com/NollGo/NollAction) 项目，并开启 Discussions 和 Pages 功能，即可立即开始体验 Noll，有关详细说明，请查看[此文章](https://nollgo.github.io/Noll/post/29.html)。
 
 # Noll 文档
 
-Noll 文档位于 <https://nollgo.github.io/noll>
+Noll 文档位于 <https://nollgo.github.io/Noll>
 
-> <https://nollgo.github.io/noll> 由 Noll 构建并由 NollAction 发布
+> <https://nollgo.github.io/Noll> 由 Noll 构建并由 NollAction 发布
 
 # 欢迎
 
