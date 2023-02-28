@@ -174,6 +174,8 @@ func render(site *RenderSite, data *GithubData, themeTmplDir string, debug bool,
 					path = "about.html"
 				case "RSS":
 					path = "rss.xml"
+				case "NewPost":
+					return fmt.Sprintf("%v/discussions/new/choose", data.Repository.URL)
 				}
 				return UnixPath(filepath.Join(site.BaseURL, path))
 			}

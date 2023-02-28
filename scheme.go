@@ -27,6 +27,8 @@ type PageInfo struct {
 
 // Repository is Github repository scheme
 type Repository struct {
+	Name        string          `json:"name"`
+	URL         string          `json:"url"`
 	Labels      *LabelPage      `json:"labels"`
 	Categories  *CategoryPage   `json:"discussionCategories"`
 	Discussions *DiscussionPage `json:"discussions"`

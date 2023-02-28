@@ -107,6 +107,8 @@ func getRepository(owner, name, token string) (*GithubData, error) {
 	return &GithubData{
 		Viewer: viewer,
 		Repository: &Repository{
+			Name:        name,
+			URL:         fmt.Sprintf("https://github.com/%v/%v", owner, name),
 			Labels:      lables,
 			Categories:  categories,
 			Discussions: discussions,
