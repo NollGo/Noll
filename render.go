@@ -206,62 +206,31 @@ func render(site *RenderSite, data *GithubData, themeTmplDir string, debug bool,
 			}
 			return site.BaseURL
 		},
-		// 获取分类下的文章列表
-		"getDiscussionByCategory": func(category string) *DiscussionPage {
+		// 根据分类或标签获取文章列表 "#标签" 或 "分类"
+		"discus": func(names ...string) *DiscussionPage {
+			categoryNames := make([]string, 0)
+			labelNames := make([]string, 0)
+			for _, name := range names {
+				if name[0:1] == "#" {
+					labelNames = append(labelNames, name)
+				} else {
+					categoryNames = append(categoryNames, name)
+				}
+			}
 			page := &DiscussionPage{
 				Nodes:      []*Discussion{},
 				TotalCount: 0,
 			}
 
-			discussions := data.Repository.Discussions.Nodes
-			for i := range discussions {
-				discussion := discussions[i]
-				if discussion.Category.Name == category {
-					page.Nodes = append(page.Nodes, discussion)
+			if len(categoryNames) > 0 {
+				for i := range categoryNames {
+					page.Nodes = append(page.Nodes, getDiscussionByCategory(categoryNames[i], data)...)
 				}
 			}
 
-			page.TotalCount = len(page.Nodes)
-			return page
-		},
-		// 获取标签下的文章列表
-		"getDiscussionByLabel": func(label string) *DiscussionPage {
-			page := &DiscussionPage{
-				Nodes:      []*Discussion{},
-				TotalCount: 0,
-			}
-
-			discussions := data.Repository.Discussions.Nodes
-			for i := range discussions {
-				discussion := discussions[i]
-				for j := range discussion.Labels.Nodes {
-					if discussion.Labels.Nodes[j].Name == label {
-						page.Nodes = append(page.Nodes, discussion)
-						break
-					}
-				}
-			}
-
-			page.TotalCount = len(page.Nodes)
-			return page
-		},
-		// 获取指定分类以及标签下的文章列表
-		"getDiscussionByCategoryAndLabel": func(category string, label string) *DiscussionPage {
-			page := &DiscussionPage{
-				Nodes:      []*Discussion{},
-				TotalCount: 0,
-			}
-
-			discussions := data.Repository.Discussions.Nodes
-			for i := range discussions {
-				discussion := discussions[i]
-				if discussion.Category.Name == category {
-					for j := range discussion.Labels.Nodes {
-						if discussion.Labels.Nodes[j].Name == label {
-							page.Nodes = append(page.Nodes, discussion)
-							break
-						}
-					}
+			if len(labelNames) > 0 {
+				for i := range labelNames {
+					page.Nodes = append(page.Nodes, getDiscussionByLabel(labelNames[i], data)...)
 				}
 			}
 
@@ -457,4 +426,37 @@ func readTemplates(rootTmpl *template.Template, r FileReader, name string) (*tem
 		}
 	}
 	return rootTmpl, nil
+}
+
+// 获取分类下的文章列表
+func getDiscussionByCategory(category string, data *GithubData) []*Discussion {
+	dis := make([]*Discussion, 0)
+
+	discussions := data.Repository.Discussions.Nodes
+	for i := range discussions {
+		discussion := discussions[i]
+		if discussion.Category.Name == category {
+			dis = append(dis, discussion)
+		}
+	}
+
+	return dis
+}
+
+// 获取标签下的文章列表
+func getDiscussionByLabel(label string, data *GithubData) []*Discussion {
+	dis := make([]*Discussion, 0)
+
+	discussions := data.Repository.Discussions.Nodes
+	for i := range discussions {
+		discussion := discussions[i]
+		for j := range discussion.Labels.Nodes {
+			if discussion.Labels.Nodes[j].Name == label {
+				dis = append(dis, discussion)
+				break
+			}
+		}
+	}
+
+	return dis
 }
