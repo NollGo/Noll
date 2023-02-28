@@ -206,6 +206,68 @@ func render(site *RenderSite, data *GithubData, themeTmplDir string, debug bool,
 			}
 			return site.BaseURL
 		},
+		// 获取分类下的文章列表
+		"getDiscussionByCategory": func(category string) *DiscussionPage {
+			page := &DiscussionPage{
+				Nodes:      []*Discussion{},
+				TotalCount: 0,
+			}
+
+			discussions := data.Repository.Discussions.Nodes
+			for i := range discussions {
+				discussion := discussions[i]
+				if discussion.Category.Name == category {
+					page.Nodes = append(page.Nodes, discussion)
+				}
+			}
+
+			page.TotalCount = len(page.Nodes)
+			return page
+		},
+		// 获取标签下的文章列表
+		"getDiscussionByLabel": func(label string) *DiscussionPage {
+			page := &DiscussionPage{
+				Nodes:      []*Discussion{},
+				TotalCount: 0,
+			}
+
+			discussions := data.Repository.Discussions.Nodes
+			for i := range discussions {
+				discussion := discussions[i]
+				for j := range discussion.Labels.Nodes {
+					if discussion.Labels.Nodes[j].Name == label {
+						page.Nodes = append(page.Nodes, discussion)
+						break
+					}
+				}
+			}
+
+			page.TotalCount = len(page.Nodes)
+			return page
+		},
+		// 获取指定分类以及标签下的文章列表
+		"getDiscussionByCategoryAndLabel": func(category string, label string) *DiscussionPage {
+			page := &DiscussionPage{
+				Nodes:      []*Discussion{},
+				TotalCount: 0,
+			}
+
+			discussions := data.Repository.Discussions.Nodes
+			for i := range discussions {
+				discussion := discussions[i]
+				if discussion.Category.Name == category {
+					for j := range discussion.Labels.Nodes {
+						if discussion.Labels.Nodes[j].Name == label {
+							page.Nodes = append(page.Nodes, discussion)
+							break
+						}
+					}
+				}
+			}
+
+			page.TotalCount = len(page.Nodes)
+			return page
+		},
 	}
 	themeTemplate, err := readTemplates(
 		template.New("__nollTemplate__").Funcs(templateFuncMap), r, ".")
