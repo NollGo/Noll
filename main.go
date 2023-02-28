@@ -90,7 +90,7 @@ func main() {
 			FS:     http.Dir(config.Pages),
 			Status: map[int]string{http.StatusNotFound: "404.html"},
 		}
-		fmt.Println("Start noll debug mode in port", port)
+		fmt.Println("Start noll debug mode in http://localhost:" + port)
 		http.Handle("/", http.StripPrefix("/", http.FileServer(fs)))
 		// 重新编译渲染接口
 		// 调试使用
@@ -124,7 +124,10 @@ func main() {
 				w.Write([]byte("Build successed!"))
 			}
 		}))
-		http.ListenAndServe(port, nil)
+		err := http.ListenAndServe(port, nil)
+		if err != nil {
+			panic(err)
+		}
 	}
 }
 
