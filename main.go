@@ -12,19 +12,29 @@ import (
 
 // Config is gd2b config
 type Config struct {
-	Owner   string `flag:"Github repository owner"`
-	Name    string `flag:"Github repository name"`
-	Token   string `flag:"Github authorization token (see https://docs.github.com/zh/graphql/guides/forming-calls-with-graphql)"`
-	Pages   string `flag:"Your github pages repository name, If None, defaults to the repository where the discussion resides"`
-	Debug   bool   `flag:"Debug mode if true"`
-	BaseURL string `flag:"Web site base url"`
-	GamID   string `flag:"Google Analytics Measurement id, Defaults to empty to not load the Google Analytics script"`
+	Owner    string `flag:"Github repository owner"`
+	Name     string `flag:"Github repository name"`
+	Token    string `flag:"Github authorization token (see https://docs.github.com/zh/graphql/guides/forming-calls-with-graphql)"`
+	Pages    string `flag:"Your github pages repository name, If None, defaults to the repository where the discussion resides"`
+	Debug    bool   `flag:"Debug mode if true"`
+	BaseURL  string `flag:"Web site base url"`
+	GamID    string `flag:"Google Analytics Measurement id, Defaults to empty to not load the Google Analytics script"`
+	ThemeDir string `flag:"Filesystem path to themes directory, Defaults to embed assets/theme"`
+	NewSite  bool   `flag:"Generate theme, Defaults to false"`
 }
 
 func main() {
 	var config Config
 	goflag.Var(&config)
 	goflag.Parse("config", "Configuration file path.")
+
+	if config.NewSite {
+		if err := newSite(config.ThemeDir); err != nil {
+			panic(err)
+		}
+		fmt.Println("New site success")
+		return
+	}
 
 	fmt.Println("Start build noll siteweb")
 
@@ -53,7 +63,7 @@ func main() {
 				BaseURL: config.BaseURL,
 				GamID:   config.GamID,
 			},
-			githubData, "assets/theme",
+			githubData, config.ThemeDir,
 			config.Debug,
 			func(s string, b []byte) error {
 				fname := strings.ReplaceAll(s, ".gtpl", ".html")
