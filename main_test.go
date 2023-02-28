@@ -137,6 +137,10 @@ func TestPref(t *testing.T) {
 	t.Log(strings.HasSuffix(str, suffix))
 }
 
+func TestNewSite(t *testing.T) {
+	fmt.Println(newSite("./test"))
+}
+
 func testRepository() *GithubData {
 	labels := &LabelPage{}
 	labels.Nodes = append(labels.Nodes, &Label{Name: "bug", Discussions: &DiscussionPage{}})
