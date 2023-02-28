@@ -35,9 +35,9 @@ func export(config Config) (err error) {
 		return err
 	}
 	for category, discussions := range discussionsMap {
-		_ = os.MkdirAll(filepath.Join(config.ExportDir, category), os.ModePerm)
+		_ = os.MkdirAll(filepath.Join(config.Export, category), os.ModePerm)
 		for _, discussion := range discussions {
-			if err = exportDiscussion(config.ExportDir, discussion, tmpl); err != nil {
+			if err = exportDiscussion(config.Export, discussion, tmpl); err != nil {
 				return err
 			}
 		}
