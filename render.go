@@ -212,7 +212,7 @@ func render(site *RenderSite, data *GithubData, themeTmplDir string, debug bool,
 			labelNames := make([]string, 0)
 			for _, name := range names {
 				if name[0:1] == "#" {
-					labelNames = append(labelNames, name)
+					labelNames = append(labelNames, name[1:])
 				} else {
 					categoryNames = append(categoryNames, name)
 				}
