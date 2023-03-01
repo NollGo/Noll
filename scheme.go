@@ -2,6 +2,7 @@ package main
 
 import (
 	"regexp"
+	"strings"
 	"time"
 )
 
@@ -79,6 +80,15 @@ type Label struct {
 // Slug 返回标签的合法的 url 名称，将其中无效的文件名替换为 '-'
 func (l *Label) Slug() string {
 	return InvaildFileNameRegex.ReplaceAllString(l.Name, "-")
+}
+
+// String 返回标签的名称列表
+func (p LabelPage) String() string {
+	var labels []string
+	for _, label := range p.Nodes {
+		labels = append(labels, label.Name)
+	}
+	return "[" + strings.Join(labels, ", ") + "]"
 }
 
 // DiscussionPage is Github Discussion page scheme

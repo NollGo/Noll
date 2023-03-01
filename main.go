@@ -21,6 +21,7 @@ type Config struct {
 	GamID    string `flag:"Google Analytics Measurement id, Defaults to empty to not load the Google Analytics script"`
 	ThemeDir string `flag:"Filesystem path to themes directory, Defaults to embed assets/theme"`
 	NewSite  bool   `flag:"Generate theme, Defaults to false"`
+	Export   string `flag:"Export all Discussions to markdown, Value is the export directory"`
 }
 
 func main() {
@@ -33,6 +34,13 @@ func main() {
 			panic(err)
 		}
 		fmt.Println("New site success")
+		return
+	}
+	if config.Export != "" {
+		if err := export(config); err != nil {
+			panic(err)
+		}
+		fmt.Println("Export success")
 		return
 	}
 
@@ -72,7 +80,7 @@ func main() {
 				if config.Debug {
 					fmt.Println(s, string(b), "\n=========================================")
 				}
-				return os.WriteFile(htmlPath, b, 0666)
+				return os.WriteFile(htmlPath, b, os.ModePerm)
 			})
 	}
 	if err = _getGithubData(); err != nil {

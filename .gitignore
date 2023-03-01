@@ -3,6 +3,7 @@
 justfile
 pages
 themes
+export
 *.exe
 *.exe~
 *.dll
