@@ -206,6 +206,38 @@ func render(site *RenderSite, data *GithubData, themeTmplDir string, debug bool,
 			}
 			return site.BaseURL
 		},
+		// 根据分类或标签获取文章列表 "#标签" 或 "分类"
+		"discus": func(names ...string) *DiscussionPage {
+			categoryNames := make([]string, 0)
+			labelNames := make([]string, 0)
+			for _, name := range names {
+				if name[0:1] == "#" {
+					labelNames = append(labelNames, name[1:])
+				} else {
+					categoryNames = append(categoryNames, name)
+				}
+			}
+			page := &DiscussionPage{
+				Nodes:      []*Discussion{},
+				TotalCount: 0,
+			}
+
+			if len(categoryNames) > 0 {
+				for i := range categoryNames {
+					page.Nodes = append(page.Nodes, getDiscussionByCategory(categoryNames[i], data)...)
+				}
+			}
+
+			if len(labelNames) > 0 {
+				for i := range labelNames {
+					page.Nodes = append(page.Nodes, getDiscussionByLabel(labelNames[i], data)...)
+				}
+			}
+
+			page.Nodes = deduplication(page.Nodes)
+			page.TotalCount = len(page.Nodes)
+			return page
+		},
 	}
 	themeTemplate, err := readTemplates(
 		template.New("__nollTemplate__").Funcs(templateFuncMap), r, ".")
@@ -395,4 +427,49 @@ func readTemplates(rootTmpl *template.Template, r FileReader, name string) (*tem
 		}
 	}
 	return rootTmpl, nil
+}
+
+// 获取分类下的文章列表
+func getDiscussionByCategory(category string, data *GithubData) []*Discussion {
+	dis := make([]*Discussion, 0)
+
+	discussions := data.Repository.Discussions.Nodes
+	for i := range discussions {
+		discussion := discussions[i]
+		if discussion.Category.Name == category {
+			dis = append(dis, discussion)
+		}
+	}
+
+	return dis
+}
+
+// 获取标签下的文章列表
+func getDiscussionByLabel(label string, data *GithubData) []*Discussion {
+	dis := make([]*Discussion, 0)
+
+	discussions := data.Repository.Discussions.Nodes
+	for i := range discussions {
+		discussion := discussions[i]
+		for j := range discussion.Labels.Nodes {
+			if discussion.Labels.Nodes[j].Name == label {
+				dis = append(dis, discussion)
+				break
+			}
+		}
+	}
+
+	return dis
+}
+
+func deduplication(dis []*Discussion) []*Discussion {
+	m := make(map[int]struct{})
+	res := make([]*Discussion, 0)
+	for _, d := range dis {
+		if _, ok := m[d.Number]; !ok {
+			m[d.Number] = struct{}{}
+			res = append(res, d)
+		}
+	}
+	return res
 }

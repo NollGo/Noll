@@ -21,7 +21,7 @@ func newSite(path string) error {
 	}
 
 	// create dir
-	_ = os.Mkdir(path, 0755)
+	_ = os.MkdirAll(path, 0755)
 
 	if err = write(path, themePath, dir); err != nil {
 		return err
