@@ -234,6 +234,7 @@ func render(site *RenderSite, data *GithubData, themeTmplDir string, debug bool,
 				}
 			}
 
+			page.Nodes = deduplication(page.Nodes)
 			page.TotalCount = len(page.Nodes)
 			return page
 		},
@@ -459,4 +460,16 @@ func getDiscussionByLabel(label string, data *GithubData) []*Discussion {
 	}
 
 	return dis
+}
+
+func deduplication(dis []*Discussion) []*Discussion {
+	m := make(map[int]struct{})
+	res := make([]*Discussion, 0)
+	for _, d := range dis {
+		if _, ok := m[d.Number]; !ok {
+			m[d.Number] = struct{}{}
+			res = append(res, d)
+		}
+	}
+	return res
 }
