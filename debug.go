@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"time"
 )
 
 var upgrader = func(event gws.Event) *gws.Upgrader {
@@ -31,6 +32,7 @@ func debugWs(config Config, _render func() error, refreshLocalMarkdown func(even
 		}
 
 		if websocket.socket != nil {
+			time.Sleep(200 * time.Millisecond)
 			_ = websocket.socket.WriteString("reload")
 		}
 		return nil
@@ -68,6 +70,7 @@ func watch(dir string, onChange func(event *fsnotify.FileEvent) error) {
 		go func() {
 			fmt.Println("Start watch file change", dir)
 			for {
+				// FIXME: 这里在修改文件时会触发4次
 				select {
 				case event := <-watcher.Event:
 					if err := onChange(event); err != nil {
