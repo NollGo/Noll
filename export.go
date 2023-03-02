@@ -12,7 +12,7 @@ title: {{ .Title }}
 createAt: {{ .CreatedAt }}
 updateAt: {{ .UpdatedAt }}
 tags: {{ .LabelsString }}
-categories: {{ .Category }}
+category: {{ .Category }}
 ---
 
 {{ .Body }}
@@ -20,7 +20,7 @@ categories: {{ .Category }}
 
 func export(config Config) (err error) {
 	var data *GithubData
-	if data, err = getRepository(config.Owner, config.Name, config.Token); err != nil {
+	if data, err = getRepository(config.Owner, config.Name, config.Token, config.Include); err != nil {
 		return err
 	}
 

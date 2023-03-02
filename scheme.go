@@ -114,6 +114,7 @@ type Discussion struct {
 	Labels         *LabelPage       `json:"labels"`
 	Comments       *CommentPage     `json:"comments"`
 	ReactionGroups []*ReactionGroup `json:"reactionGroups"`
+	LocalPath      string           `json:"localPath"`
 }
 
 // CommentPage is Github Discussion Comment page scheme

@@ -105,7 +105,7 @@ func TestRender(t *testing.T) {
 		&RenderSite{"/", ""},
 		testRepository(),
 		"assets/theme",
-		true,
+		true, "",
 		func(s string, b []byte) error {
 			fmt.Println(s)
 			_, err := os.Stdout.Write(b)
@@ -139,6 +139,14 @@ func TestPref(t *testing.T) {
 
 func TestNewSite(t *testing.T) {
 	fmt.Println(newSite("./test"))
+}
+
+func TestRenderMarkdown(t *testing.T) {
+	//markdown, err := renderMarkdown(`# Hello World`, os.Getenv("GH_TOKEN"))
+	//if err != nil {
+	//	t.Fatal(err)
+	//}
+	//fmt.Println(markdown)
 }
 
 func testRepository() *GithubData {

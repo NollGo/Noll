@@ -1,8 +1,10 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"regexp"
@@ -16,7 +18,7 @@ func getGemoji(gemoji string) string {
 	return result[0]
 }
 
-func getRepository(owner, name, token string) (*GithubData, error) {
+func getRepository(owner, name, token, include string) (*GithubData, error) {
 	fmt.Printf("Start get %v/%v repository\n", owner, name)
 
 	viewer, err := getViewer(owner, token)
@@ -102,6 +104,12 @@ func getRepository(owner, name, token string) (*GithubData, error) {
 		// 是否有下一页
 		hasNextPage = discussionPage.PageInfo.HasNextPage
 		endCursor = discussionPage.PageInfo.EndCursor
+	}
+
+	// 本地文件 preview
+	if include != "" {
+		discussions.Nodes = append(discussions.Nodes, includeLocal(include, viewer, lables, categories, token)...)
+		discussions.TotalCount = len(discussions.Nodes)
 	}
 
 	return &GithubData{
@@ -339,6 +347,38 @@ func query(body string, token string, result *Body) error {
 	}
 
 	return nil
+}
+
+func renderMarkdown(markdown string, token string) (string, error) {
+	body := map[string]interface{}{
+		"text": markdown,
+	}
+	bodyBytes, err := json.Marshal(body)
+	if err != nil {
+		return "", err
+	}
+
+	req, err := http.NewRequest("POST", "https://api.github.com/markdown", bytes.NewReader(bodyBytes))
+	if err != nil {
+		return "", err
+	}
+
+	req.Header.Set("Authorization", "bearer "+token)
+	req.Header.Set("X-GitHub-Api-Version", "2022-11-28")
+
+	response, err := http.DefaultClient.Do(req)
+	if err != nil {
+		return "", err
+	}
+	defer response.Body.Close()
+
+	resBodyBytes, err := io.ReadAll(response.Body)
+
+	if http.StatusOK != response.StatusCode {
+		return "", fmt.Errorf("Render markdown err: %v\n%v", response.Status, string(resBodyBytes))
+	}
+
+	return string(resBodyBytes), nil
 }
 
 // queryf 参数的值来源 https://docs.github.com/zh/graphql/overview/explorer

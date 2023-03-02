@@ -122,7 +122,7 @@ func UnixPath(path string) string {
 	return strings.ReplaceAll(filepath.Clean(path), `\`, "/")
 }
 
-func render(site *RenderSite, data *GithubData, themeTmplDir string, debug bool, writer WriterFunc) error {
+func render(site *RenderSite, data *GithubData, themeTmplDir string, debug bool, include string, writer WriterFunc) error {
 	// 1. 获取全局资源（assets 文件夹）文件
 	readGlobalFile := func(name string) ([]byte, error) {
 		var fname = filepath.Join("assets", name)

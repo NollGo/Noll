@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"github.com/howeyc/fsnotify"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -22,6 +23,7 @@ type Config struct {
 	ThemeDir string `flag:"Filesystem path to themes directory, Defaults to embed assets/theme"`
 	NewSite  bool   `flag:"Generate theme, Defaults to false"`
 	Export   string `flag:"Export all Discussions to markdown, Value is the export directory"`
+	Include  string `flag:"Include local files to preivew, Value is the local files directory"`
 }
 
 func main() {
@@ -61,7 +63,7 @@ func main() {
 	var githubData *GithubData
 
 	_getGithubData := func() error {
-		githubData, err = getRepository(config.Owner, config.Name, config.Token)
+		githubData, err = getRepository(config.Owner, config.Name, config.Token, config.Include)
 		return err
 	}
 
@@ -72,17 +74,72 @@ func main() {
 				GamID:   config.GamID,
 			},
 			githubData, config.ThemeDir,
-			config.Debug,
+			config.Debug, config.Include,
 			func(s string, b []byte) error {
 				fname := strings.ReplaceAll(s, ".gtpl", ".html")
 				htmlPath := filepath.Join(config.Pages, fname)
 				MkdirFileFolderIfNotExists(htmlPath)
 				if config.Debug {
-					fmt.Println(s, string(b), "\n=========================================")
+					//fmt.Println(s, string(b), "\n=========================================")
 				}
 				return os.WriteFile(htmlPath, b, os.ModePerm)
 			})
 	}
+
+	_refreshLocalMarkdown := func(evnet *fsnotify.FileEvent) error {
+		if !strings.HasPrefix(evnet.Name, config.Include) {
+			return nil
+		}
+		if !strings.HasSuffix(evnet.Name, ".md") {
+			return nil
+		}
+
+		// map path nodes
+		discussionMap := make(map[string]*Discussion)
+		nodes := githubData.Repository.Discussions.Nodes
+		for i := range nodes {
+			discussion := nodes[i]
+			if discussion.LocalPath != "" {
+				discussionMap[discussion.LocalPath] = discussion
+			}
+		}
+
+		eventFilePath := filepath.Clean(evnet.Name)
+
+		if evnet.IsCreate() {
+			fmt.Println("Create", eventFilePath)
+		}
+
+		if evnet.IsCreate() && discussionMap[eventFilePath] == nil {
+			newDis := includeLocal(eventFilePath, githubData.Viewer, githubData.Repository.Labels, githubData.Repository.Categories, config.Token)
+			githubData.Repository.Discussions.Nodes = append(githubData.Repository.Discussions.Nodes, newDis...)
+			githubData.Repository.Discussions.TotalCount += len(newDis)
+			return nil
+		}
+
+		if evnet.IsModify() {
+			newDis := includeLocal(eventFilePath, githubData.Viewer, githubData.Repository.Labels, githubData.Repository.Categories, config.Token)
+			if len(newDis) <= 0 {
+				return nil
+			}
+
+			if discussionMap[eventFilePath] == nil {
+				discussionMap[eventFilePath] = newDis[0]
+				return nil
+			}
+
+			discussionMap[eventFilePath].Title = newDis[0].Title
+			discussionMap[eventFilePath].Body = newDis[0].Body
+			discussionMap[eventFilePath].BodyHTML = newDis[0].BodyHTML
+			discussionMap[eventFilePath].LocalPath = newDis[0].LocalPath
+			discussionMap[eventFilePath].CreatedAt = newDis[0].CreatedAt
+			discussionMap[eventFilePath].UpdatedAt = newDis[0].UpdatedAt
+			discussionMap[eventFilePath].Labels = newDis[0].Labels
+			discussionMap[eventFilePath].Category = newDis[0].Category
+		}
+		return nil
+	}
+
 	if err = _getGithubData(); err != nil {
 		panic(err)
 	}
@@ -100,7 +157,7 @@ func main() {
 		}
 		fmt.Println("Start noll debug mode in http://localhost" + port)
 
-		http.Handle("/ws", debugWs(config, _render))
+		http.Handle("/ws", debugWs(config, _render, _refreshLocalMarkdown))
 		http.Handle("/", http.StripPrefix("/", http.FileServer(fs)))
 		// 重新编译渲染接口
 		// 调试使用

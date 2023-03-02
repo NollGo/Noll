@@ -18,13 +18,34 @@ var upgrader = func(event gws.Event) *gws.Upgrader {
 	})
 }
 
-func debugWs(config Config, _render func() error) http.Handler {
+func debugWs(config Config, _render func() error, refreshLocalMarkdown func(event *fsnotify.FileEvent) error) http.Handler {
 	websocket := &DebugWs{}
+
+	modify := func(event *fsnotify.FileEvent) error {
+		if err := refreshLocalMarkdown(event); err != nil {
+			return err
+		}
+
+		if err := _render(); err != nil {
+			panic(err)
+		}
+
+		if websocket.socket != nil {
+			_ = websocket.socket.WriteString("reload")
+		}
+		return nil
+	}
 
 	// watch file change config.ThemeDir
 	dirList := collDir(config.ThemeDir)
 	for i := range dirList {
-		watch(dirList[i], _render, websocket)
+
+		watch(dirList[i], modify)
+	}
+
+	dirList = collDir(config.Include)
+	for i := range dirList {
+		watch(dirList[i], modify)
 	}
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -38,7 +59,7 @@ func debugWs(config Config, _render func() error) http.Handler {
 	})
 }
 
-func watch(dir string, _render func() error, websocket *DebugWs) {
+func watch(dir string, onChange func(event *fsnotify.FileEvent) error) {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
 		panic(err)
@@ -48,13 +69,9 @@ func watch(dir string, _render func() error, websocket *DebugWs) {
 			fmt.Println("Start watch file change", dir)
 			for {
 				select {
-				case <-watcher.Event:
-					if err := _render(); err != nil {
-						panic(err)
-					}
-
-					if websocket.socket != nil {
-						_ = websocket.socket.WriteString("reload")
+				case event := <-watcher.Event:
+					if err := onChange(event); err != nil {
+						fmt.Println("handle modify error:", err)
 					}
 				case err := <-watcher.Error:
 					fmt.Println("error:", err)
