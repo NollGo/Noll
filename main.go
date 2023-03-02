@@ -17,6 +17,7 @@ type Config struct {
 	Token    string `flag:"Github authorization token (see https://docs.github.com/zh/graphql/guides/forming-calls-with-graphql)"`
 	Pages    string `flag:"Your github pages repository name, If None, defaults to the repository where the discussion resides"`
 	Debug    bool   `flag:"Debug mode if true"`
+	DebugMod string `flag:"Debug mode: auto, manual. Automatic debugging mode and manual debugging mode"`
 	BaseURL  string `flag:"Web site base url"`
 	GamID    string `flag:"Google Analytics Measurement id, Defaults to empty to not load the Google Analytics script"`
 	ThemeDir string `flag:"Filesystem path to themes directory, Defaults to embed assets/theme"`
@@ -48,6 +49,9 @@ func main() {
 
 	if config.Pages == "" {
 		config.Pages = config.Name
+	}
+	if config.ThemeDir == "" {
+		config.ThemeDir = "assets/theme"
 	}
 
 	pageDomain := fmt.Sprintf("%v.github.io", config.Owner)
@@ -99,6 +103,10 @@ func main() {
 			Status: map[int]string{http.StatusNotFound: "404.html"},
 		}
 		fmt.Println("Start noll debug mode in http://localhost" + port)
+
+		if config.DebugMod == "auto" {
+			http.Handle("/ws", debugWs(config, _render))
+		}
 		http.Handle("/", http.StripPrefix("/", http.FileServer(fs)))
 		// 重新编译渲染接口
 		// 调试使用
@@ -132,7 +140,7 @@ func main() {
 				w.Write([]byte("Build successed!"))
 			}
 		}))
-		err := http.ListenAndServe(port, nil)
+		err = http.ListenAndServe(port, nil)
 		if err != nil {
 			panic(err)
 		}

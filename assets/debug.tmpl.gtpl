@@ -125,4 +125,20 @@
     }
     return debugButton
   }
+
+  function ws() {
+    let webSocket = new WebSocket("ws://localhost:20000/ws");
+    webSocket.onopen = function (event) {
+      console.log("onopen", event);
+    };
+
+    webSocket.onmessage = function (event) {
+      if (event.type === 'message' && event.data === 'reload') {
+        console.log("reload")
+        location.reload()
+      }
+    };
+  }
+
+  ws()
 </script>
