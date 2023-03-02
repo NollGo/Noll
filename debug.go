@@ -80,8 +80,6 @@ func collDir(path string) []string {
 		return []string{}
 	}
 
-	fmt.Println(dirs)
-
 	return dirs
 }
 
