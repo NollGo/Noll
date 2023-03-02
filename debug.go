@@ -54,9 +54,7 @@ func watch(dir string, _render func() error, websocket *DebugWs) {
 					}
 
 					if websocket.socket != nil {
-						if err := websocket.socket.WriteString("reload"); err != nil {
-							return // close socket
-						}
+						_ = websocket.socket.WriteString("reload")
 					}
 				case err := <-watcher.Error:
 					fmt.Println("error:", err)
