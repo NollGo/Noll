@@ -2,13 +2,12 @@ package main
 
 import (
 	"fmt"
-	"github.com/howeyc/fsnotify"
+	"github.com/excing/goflag"
+	"github.com/fsnotify/fsnotify"
 	"net/http"
 	"os"
 	"path/filepath"
 	"strings"
-
-	"github.com/excing/goflag"
 )
 
 // Config is gd2b config
@@ -86,11 +85,14 @@ func main() {
 			})
 	}
 
-	_refreshLocalMarkdown := func(evnet *fsnotify.FileEvent) error {
-		if !strings.HasPrefix(evnet.Name, config.Include) {
+	_refreshLocalMarkdown := func(evnet fsnotify.Event) error {
+		eventName := filepath.Clean(evnet.Name)
+		include := filepath.Clean(config.Include)
+
+		if !strings.HasPrefix(eventName, include) {
 			return nil
 		}
-		if !strings.HasSuffix(evnet.Name, ".md") {
+		if !strings.HasSuffix(eventName, ".md") {
 			return nil
 		}
 
@@ -104,38 +106,32 @@ func main() {
 			}
 		}
 
-		eventFilePath := filepath.Clean(evnet.Name)
-
-		if evnet.IsCreate() {
-			fmt.Println("Create", eventFilePath)
-		}
-
-		if evnet.IsCreate() && discussionMap[eventFilePath] == nil {
-			newDis := includeLocal(eventFilePath, githubData.Viewer, githubData.Repository.Labels, githubData.Repository.Categories, config.Token)
+		if evnet.Has(fsnotify.Create) && discussionMap[eventName] == nil {
+			newDis := includeLocal(eventName, githubData.Viewer, githubData.Repository.Labels, githubData.Repository.Categories, config.Token)
 			githubData.Repository.Discussions.Nodes = append(githubData.Repository.Discussions.Nodes, newDis...)
 			githubData.Repository.Discussions.TotalCount += len(newDis)
 			return nil
 		}
 
-		if evnet.IsModify() {
-			newDis := includeLocal(eventFilePath, githubData.Viewer, githubData.Repository.Labels, githubData.Repository.Categories, config.Token)
+		if evnet.Has(fsnotify.Write) {
+			newDis := includeLocal(eventName, githubData.Viewer, githubData.Repository.Labels, githubData.Repository.Categories, config.Token)
 			if len(newDis) <= 0 {
 				return nil
 			}
 
-			if discussionMap[eventFilePath] == nil {
-				discussionMap[eventFilePath] = newDis[0]
+			if discussionMap[eventName] == nil {
+				discussionMap[eventName] = newDis[0]
 				return nil
 			}
 
-			discussionMap[eventFilePath].Title = newDis[0].Title
-			discussionMap[eventFilePath].Body = newDis[0].Body
-			discussionMap[eventFilePath].BodyHTML = newDis[0].BodyHTML
-			discussionMap[eventFilePath].LocalPath = newDis[0].LocalPath
-			discussionMap[eventFilePath].CreatedAt = newDis[0].CreatedAt
-			discussionMap[eventFilePath].UpdatedAt = newDis[0].UpdatedAt
-			discussionMap[eventFilePath].Labels = newDis[0].Labels
-			discussionMap[eventFilePath].Category = newDis[0].Category
+			discussionMap[eventName].Title = newDis[0].Title
+			discussionMap[eventName].Body = newDis[0].Body
+			discussionMap[eventName].BodyHTML = newDis[0].BodyHTML
+			discussionMap[eventName].LocalPath = newDis[0].LocalPath
+			discussionMap[eventName].CreatedAt = newDis[0].CreatedAt
+			discussionMap[eventName].UpdatedAt = newDis[0].UpdatedAt
+			discussionMap[eventName].Labels = newDis[0].Labels
+			discussionMap[eventName].Category = newDis[0].Category
 		}
 		return nil
 	}

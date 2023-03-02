@@ -2,7 +2,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/howeyc/fsnotify"
+	"github.com/fsnotify/fsnotify"
 	"github.com/lxzan/gws"
 	"net/http"
 	"os"
@@ -19,10 +19,10 @@ var upgrader = func(event gws.Event) *gws.Upgrader {
 	})
 }
 
-func debugWs(config Config, _render func() error, refreshLocalMarkdown func(event *fsnotify.FileEvent) error) http.Handler {
+func debugWs(config Config, _render func() error, refreshLocalMarkdown func(event fsnotify.Event) error) http.Handler {
 	websocket := &DebugWs{}
 
-	modify := func(event *fsnotify.FileEvent) error {
+	modify := func(event fsnotify.Event) error {
 		if err := refreshLocalMarkdown(event); err != nil {
 			return err
 		}
@@ -39,16 +39,38 @@ func debugWs(config Config, _render func() error, refreshLocalMarkdown func(even
 	}
 
 	// watch file change config.ThemeDir
+	watcher, err := fsnotify.NewWatcher()
+	if err != nil {
+		panic(err)
+	}
+
 	dirList := collDir(config.ThemeDir)
 	for i := range dirList {
-
-		watch(dirList[i], modify)
+		if err := watcher.Add(dirList[i]); err != nil {
+			fmt.Println("watcher add error:", err)
+			return nil
+		}
 	}
-
 	dirList = collDir(config.Include)
 	for i := range dirList {
-		watch(dirList[i], modify)
+		if err := watcher.Add(dirList[i]); err != nil {
+			fmt.Println("watcher add error:", err)
+			return nil
+		}
 	}
+
+	go func() {
+		for {
+			select {
+			case event := <-watcher.Events:
+				if err := modify(event); err != nil {
+					fmt.Println("handle modify error:", err)
+				}
+			case err := <-watcher.Errors:
+				fmt.Println("error:", err)
+			}
+		}
+	}()
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		socket, err := upgrader(websocket).Accept(w, r)
@@ -59,29 +81,6 @@ func debugWs(config Config, _render func() error, refreshLocalMarkdown func(even
 		websocket.socket = socket
 		go socket.Listen()
 	})
-}
-
-func watch(dir string, onChange func(event *fsnotify.FileEvent) error) {
-	watcher, err := fsnotify.NewWatcher()
-	if err != nil {
-		panic(err)
-	}
-	if err := watcher.Watch(dir); err == nil {
-		go func() {
-			fmt.Println("Start watch file change", dir)
-			for {
-				// FIXME: 这里在修改文件时会触发4次
-				select {
-				case event := <-watcher.Event:
-					if err := onChange(event); err != nil {
-						fmt.Println("handle modify error:", err)
-					}
-				case err := <-watcher.Error:
-					fmt.Println("error:", err)
-				}
-			}
-		}()
-	}
 }
 
 // collect all dir
