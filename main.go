@@ -78,7 +78,7 @@ func main() {
 				htmlPath := filepath.Join(config.Pages, fname)
 				MkdirFileFolderIfNotExists(htmlPath)
 				if config.Debug {
-					//fmt.Println(s, string(b), "\n=========================================")
+					fmt.Println(s, string(b), "\n=========================================")
 				}
 				return os.WriteFile(htmlPath, b, os.ModePerm)
 			})
