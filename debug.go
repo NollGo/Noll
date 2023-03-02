@@ -69,6 +69,10 @@ func watch(dir string, _render func() error, websocket *DebugWs) {
 
 // collect all dir
 func collDir(path string) []string {
+	if path == "" {
+		return []string{}
+	}
+
 	var dirs []string
 
 	if err := filepath.Walk(path, func(path string, info os.FileInfo, err error) error {
