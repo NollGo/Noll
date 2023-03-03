@@ -108,8 +108,7 @@ func main() {
 
 		if evnet.Has(fsnotify.Create) && discussionMap[eventName] == nil {
 			newDis := includeLocal(eventName, githubData.Viewer, githubData.Repository.Labels, githubData.Repository.Categories, config.Token)
-			githubData.Repository.Discussions.Nodes = append(githubData.Repository.Discussions.Nodes, newDis...)
-			githubData.Repository.Discussions.TotalCount += len(newDis)
+			appendDis(githubData, newDis)
 			return nil
 		}
 
@@ -120,7 +119,7 @@ func main() {
 			}
 
 			if discussionMap[eventName] == nil {
-				discussionMap[eventName] = newDis[0]
+				appendDis(githubData, newDis)
 				return nil
 			}
 
@@ -192,6 +191,11 @@ func main() {
 			panic(err)
 		}
 	}
+}
+
+func appendDis(githubData *GithubData, newDis []*Discussion) {
+	githubData.Repository.Discussions.Nodes = append(githubData.Repository.Discussions.Nodes, newDis...)
+	githubData.Repository.Discussions.TotalCount += len(newDis)
 }
 
 // DirWithError 带有错误状态页面的 http 文件系统
