@@ -86,6 +86,10 @@ func main() {
 	}
 
 	_refreshLocalMarkdown := func(evnet fsnotify.Event) error {
+		if config.Include == "" {
+			return nil
+		}
+
 		eventName := filepath.Clean(evnet.Name)
 		include := filepath.Clean(config.Include)
 
