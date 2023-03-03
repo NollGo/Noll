@@ -108,7 +108,11 @@ func main() {
 
 		if evnet.Has(fsnotify.Create) && discussionMap[eventName] == nil {
 			newDis := includeLocal(eventName, githubData.Viewer, githubData.Repository.Labels, githubData.Repository.Categories, config.Token)
-			appendDis(githubData, newDis)
+			if len(newDis) <= 0 {
+				return nil
+			}
+
+			githubData = appendDis(githubData, newDis)
 			return nil
 		}
 
@@ -119,7 +123,7 @@ func main() {
 			}
 
 			if discussionMap[eventName] == nil {
-				appendDis(githubData, newDis)
+				githubData = appendDis(githubData, newDis)
 				return nil
 			}
 
@@ -132,6 +136,11 @@ func main() {
 			discussionMap[eventName].Labels = newDis[0].Labels
 			discussionMap[eventName].Category = newDis[0].Category
 		}
+
+		if evnet.Has(fsnotify.Remove) && discussionMap[eventName] != nil {
+			githubData = deleteDis(githubData, eventName)
+		}
+
 		return nil
 	}
 
@@ -193,9 +202,23 @@ func main() {
 	}
 }
 
-func appendDis(githubData *GithubData, newDis []*Discussion) {
+func deleteDis(data *GithubData, localPath string) *GithubData {
+	nodes := data.Repository.Discussions.Nodes
+	for i := range nodes {
+		if nodes[i].LocalPath == localPath {
+			data.Repository.Discussions.Nodes = append(nodes[:i], nodes[i+1:]...)
+			data.Repository.Discussions.TotalCount--
+			return data
+		}
+	}
+	return data
+}
+
+func appendDis(githubData *GithubData, newDis []*Discussion) *GithubData {
 	githubData.Repository.Discussions.Nodes = append(githubData.Repository.Discussions.Nodes, newDis...)
 	githubData.Repository.Discussions.TotalCount += len(newDis)
+
+	return githubData
 }
 
 // DirWithError 带有错误状态页面的 http 文件系统
