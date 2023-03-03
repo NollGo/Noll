@@ -269,30 +269,35 @@ func render(site *RenderSite, data *GithubData, themeTmplDir string, debug bool,
 	if err = indexTemplate.Execute(stringWriter.Reset(), _data); err != nil {
 		return err
 	}
+	appendGlobalJs(stringWriter, jsRenderTemplate)
 	htmlPages[indexTemplate.Name()] = stringWriter.String()
 
 	notFoundTemplate := themeTemplate.Lookup("404.gtpl")
 	if err = notFoundTemplate.Execute(stringWriter.Reset(), _data); err != nil {
 		return err
 	}
+	appendGlobalJs(stringWriter, jsRenderTemplate)
 	htmlPages[notFoundTemplate.Name()] = stringWriter.String()
 
 	categoriesTemplate := themeTemplate.Lookup("categories.gtpl")
 	if err = categoriesTemplate.Execute(stringWriter.Reset(), _data); err != nil {
 		return err
 	}
+	appendGlobalJs(stringWriter, jsRenderTemplate)
 	htmlPages[categoriesTemplate.Name()] = stringWriter.String()
 
 	labelsTemplate := themeTemplate.Lookup("labels.gtpl")
 	if err = labelsTemplate.Execute(stringWriter.Reset(), _data); err != nil {
 		return err
 	}
+	appendGlobalJs(stringWriter, jsRenderTemplate)
 	htmlPages[labelsTemplate.Name()] = stringWriter.String()
 
 	aboutTemplate := themeTemplate.Lookup("about.gtpl")
 	if err = aboutTemplate.Execute(stringWriter.Reset(), _data); err != nil {
 		return err
 	}
+	appendGlobalJs(stringWriter, jsRenderTemplate)
 	htmlPages[aboutTemplate.Name()] = stringWriter.String()
 
 	categoryTemplate := themeTemplate.Lookup("category.gtpl")
@@ -301,6 +306,7 @@ func render(site *RenderSite, data *GithubData, themeTmplDir string, debug bool,
 		if err = categoryTemplate.Execute(stringWriter.Reset(), _data); err != nil {
 			return err
 		}
+		appendGlobalJs(stringWriter, jsRenderTemplate)
 		htmlPages[fmt.Sprintf(`category/%v.gtpl`, category.Slug())] = stringWriter.String()
 	}
 
@@ -310,6 +316,7 @@ func render(site *RenderSite, data *GithubData, themeTmplDir string, debug bool,
 		if err = labelTemplate.Execute(stringWriter.Reset(), _data); err != nil {
 			return err
 		}
+		appendGlobalJs(stringWriter, jsRenderTemplate)
 		htmlPages[fmt.Sprintf(`label/%v.gtpl`, label.Slug())] = stringWriter.String()
 	}
 
@@ -319,10 +326,7 @@ func render(site *RenderSite, data *GithubData, themeTmplDir string, debug bool,
 		if err = postTemplate.Execute(stringWriter.Reset(), _data); err != nil {
 			return err
 		}
-		jrl := &JsRenderLoader{HTML: stringWriter.String()}
-		if jrl.Has() {
-			jsRenderTemplate.Execute(stringWriter, jrl)
-		}
+		appendGlobalJs(stringWriter, jsRenderTemplate)
 		htmlPages[fmt.Sprintf(`post/%v.gtpl`, discussion.Number)] = stringWriter.String()
 	}
 
@@ -374,6 +378,13 @@ func render(site *RenderSite, data *GithubData, themeTmplDir string, debug bool,
 	}
 
 	return nil
+}
+
+func appendGlobalJs(stringWriter *StringWriter, jsRenderTemplate *template.Template) {
+	jrl := &JsRenderLoader{HTML: stringWriter.String()}
+	if jrl.Has() {
+		jsRenderTemplate.Execute(stringWriter, jrl)
+	}
 }
 
 func copyNonRenderFiles(r FileReader, name string, writer WriterFunc) error {
