@@ -2,19 +2,20 @@ package main
 
 import (
 	"fmt"
-	"github.com/howeyc/fsnotify"
-	"github.com/lxzan/gws"
 	"net/http"
 	"os"
 	"path/filepath"
+
+	"github.com/howeyc/fsnotify"
+	"github.com/lxzan/gws"
 )
 
 var upgrader = func(event gws.Event) *gws.Upgrader {
-	return gws.NewUpgrader(func(c *gws.Upgrader) {
-		c.CompressEnabled = true
-		c.CheckTextEncoding = true
-		c.MaxContentLength = 32 * 1024 * 1024
-		c.EventHandler = event
+	return gws.NewUpgrader(event, &gws.ServerOption{
+		CompressEnabled:     true,
+		CheckUtf8Enabled:    true,
+		ReadMaxPayloadSize:  32 * 1024 * 1024,
+		WriteMaxPayloadSize: 32 * 1024 * 1024,
 	})
 }
 
@@ -84,24 +85,34 @@ func collDir(path string) []string {
 	return dirs
 }
 
+// DebugWs is 调试 websocket event
 type DebugWs struct {
 	socket *gws.Conn
 }
 
+// OnOpen is websocket 建立连接事件
 func (d DebugWs) OnOpen(socket *gws.Conn) {
 }
 
+// OnError is websocket 错误事件
+// IO错误, 协议错误, 压缩解压错误...
 func (d DebugWs) OnError(socket *gws.Conn, err error) {
 }
 
+// OnClose is websocket 关闭事件
+// 另一端发送了关闭帧
 func (d DebugWs) OnClose(socket *gws.Conn, code uint16, reason []byte) {
 }
 
+// OnPing is websocket 心跳探测事件
 func (d DebugWs) OnPing(socket *gws.Conn, payload []byte) {
 }
 
+// OnPong is websocket 心跳响应事件
 func (d DebugWs) OnPong(socket *gws.Conn, payload []byte) {
 }
 
+// OnMessage is websocket 消息事件
+// 如果开启了AsyncReadEnabled, 可以在一个连接里面并行处理多个请求
 func (d DebugWs) OnMessage(socket *gws.Conn, message *gws.Message) {
 }
