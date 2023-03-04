@@ -6,7 +6,7 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/howeyc/fsnotify"
+	"github.com/fsnotify/fsnotify"
 	"github.com/lxzan/gws"
 )
 
@@ -24,8 +24,13 @@ func debugWs(config Config, _render func() error) http.Handler {
 
 	// watch file change config.ThemeDir
 	dirList := collDir(config.ThemeDir)
+	pathChan, err := watch(_render, websocket)
+	if err != nil {
+		panic(err)
+	}
+
 	for i := range dirList {
-		watch(dirList[i], _render, websocket)
+		pathChan <- dirList[i]
 	}
 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -39,30 +44,47 @@ func debugWs(config Config, _render func() error) http.Handler {
 	})
 }
 
-func watch(dir string, _render func() error, websocket *DebugWs) {
+func watch(_render func() error, websocket *DebugWs) (chan string, error) {
 	watcher, err := fsnotify.NewWatcher()
 	if err != nil {
-		panic(err)
+		return nil, err
 	}
-	if err := watcher.Watch(dir); err == nil {
-		go func() {
-			fmt.Println("Start watch file change", dir)
-			for {
-				select {
-				case <-watcher.Event:
+
+	go func() {
+		for {
+			select {
+			case event := <-watcher.Events:
+
+				if event.Has(fsnotify.Write) {
 					if err := _render(); err != nil {
-						panic(err)
+						fmt.Println("error:", err)
 					}
 
 					if websocket.socket != nil {
 						_ = websocket.socket.WriteString("reload")
 					}
-				case err := <-watcher.Error:
-					fmt.Println("error:", err)
+				}
+			case err := <-watcher.Errors:
+				fmt.Println("error:", err)
+			}
+		}
+	}()
+
+	pathChan := make(chan string)
+	go func() {
+		for {
+			select {
+			case path := <-pathChan:
+				if err := watcher.Add(path); err == nil {
+					fmt.Println("Start watch file change", path)
+				} else {
+					panic(err)
 				}
 			}
-		}()
-	}
+		}
+	}()
+
+	return pathChan, nil
 }
 
 // collect all dir
