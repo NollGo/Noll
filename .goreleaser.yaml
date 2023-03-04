@@ -1,6 +1,6 @@
 project_name: noll
 builds:
-  - env: [CGO_ENABLED=1]
+  - env: [CGO_ENABLED=0]
     goos:
       - linux
       - windows
