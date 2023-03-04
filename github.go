@@ -67,14 +67,15 @@ func getRepository(owner, name, token string) (*GithubData, error) {
 				if 0 < commentPage.TotalCount {
 					discussion.Comments.Nodes = append(discussion.Comments.Nodes, commentPage.Nodes...)
 					discussion.Comments.PageInfo = commentPage.PageInfo
-					discussion.Comments.TotalCount += commentPage.TotalCount
 				}
 
 				// 是否有下一页评论
 				hasNextCommentPage = commentPage.PageInfo.HasNextPage
 				endCommentCursor = commentPage.PageInfo.EndCursor
 			}
+			discussion.Comments.TotalCount = len(discussion.Comments.Nodes)
 
+			// 获取分类的文章列表
 			discussion.Category.EmojiHTML = getGemoji(discussion.Category.EmojiHTML)
 			for _, category := range categories.Nodes {
 				if category.Name == discussion.Category.Name {
@@ -83,6 +84,7 @@ func getRepository(owner, name, token string) (*GithubData, error) {
 				}
 			}
 
+			// 获取标签的文章列表
 			for _, discussLabel := range discussion.Labels.Nodes {
 				for _, label := range lables.Nodes {
 					if discussLabel.Name == label.Name {
@@ -96,13 +98,13 @@ func getRepository(owner, name, token string) (*GithubData, error) {
 		if 0 < discussionPage.TotalCount {
 			discussions.Nodes = append(discussions.Nodes, discussionPage.Nodes...)
 			discussions.PageInfo = discussionPage.PageInfo
-			discussions.TotalCount += discussionPage.TotalCount
 		}
 
 		// 是否有下一页
 		hasNextPage = discussionPage.PageInfo.HasNextPage
 		endCursor = discussionPage.PageInfo.EndCursor
 	}
+	discussions.TotalCount = len(discussions.Nodes)
 
 	return &GithubData{
 		Viewer: viewer,
