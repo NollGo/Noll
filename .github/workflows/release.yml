@@ -18,6 +18,13 @@ jobs:
             goos: windows
     steps:
     - uses: actions/checkout@v3
+    - name: Go get
+      run: |
+        go get -v -u -d ./...
+        if [ -f Gopkg.toml ]; then
+            curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+            dep ensure
+        fi
     # https://github.com/marketplace/actions/go-release-binaries
     - uses: wangyoucao577/go-release-action@v1
       with:
