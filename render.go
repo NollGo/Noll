@@ -373,6 +373,15 @@ func render(site *RenderSite, data *GithubData, themeTmplDir string, debug bool,
 		}
 	}
 
+	rssTemplate := themeTemplate.Lookup("rss.gtpl")
+	_data.Data = data.Repository.Discussions
+	if err = rssTemplate.Execute(stringWriter.Reset(), _data); err != nil {
+		return err
+	}
+	if err = writer("rss.xml", stringWriter.Data); err != nil {
+		return err
+	}
+
 	return nil
 }
 

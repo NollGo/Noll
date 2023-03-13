@@ -6,7 +6,7 @@
     | Theme default</div>
   <div><a href='{{ url "/" }}'>{{ .ShowName }}</a>© 2023 |
     <a href="https://creativecommons.org/licenses/by-nc/4.0/">CC BY-NC 4.0</a>
-    <!-- | <a href='{{ url "RSS" }}'>RSS</a> -->
+    | <a href='{{ url "RSS" }}'>RSS</a>
   </div>
 </footer>
 {{end}}
