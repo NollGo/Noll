@@ -11,7 +11,7 @@ import (
 
 func getGemoji(gemoji string) string {
 	fmt.Printf("Start parse gemoji %v \n", gemoji)
-	gEmojiRegex := `<g-emoji .*>(.*)</g-emoji>`
+	gEmojiRegex := `<div .*>(.*)</div>`
 	regex := regexp.MustCompile(gEmojiRegex)
 	result := regex.FindStringSubmatch(gemoji)
 	if len(result) == 0 {
