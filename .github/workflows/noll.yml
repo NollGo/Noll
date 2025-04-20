@@ -25,13 +25,21 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v3
+      - name: Set up Go
+        uses: actions/setup-go@v5  # 使用最新版 v5
+        with:
+          go-version: '1.16'  # 指定精确版本（支持语义化版本，如 '1.21.x'）
+      - name: Verify Go
+        run: |
+          go version
+          go env GOROOT  # 检查安装路径
       - name: Install Noll
         run: |
             git clone https://github.com/NollGo/Noll
             cd Noll
-            go get -v -u -d ./...
+            go get -v -d ./...
             if [ -f Gopkg.toml ]; then
-                curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+                DEP_RELEASE_TAG=v1.16 && curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
                 dep ensure
             fi
             ls -a -lh
@@ -50,11 +58,11 @@ jobs:
             baseURL="/$repositoryName"
             gamID="${{ vars.GAMID }}"
             echo "${{ github.repository_owner }}, $repositoryName, ${{secrets.GITHUB_TOKEN}}, $pagesPath, $baseURL, $gamID,"
-            ./Noll/io.github.nollgo -owner ${{ github.repository_owner }} -name $repositoryName  -token ${{secrets.GITHUB_TOKEN}} -pages "$pagesPath" -baseURL "$baseURL" -gamID "$gamID"
+            ./Noll/io.github.nollgo -owner ${{ github.repository_owner }} -name $repositoryName  -token ${{secrets.GITHUB_TOKEN}} -pages $pagesPath -baseURL $baseURL -gamID $gamID
             rm -rf ./Noll
             ls -a -lh
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v1
+        uses: actions/upload-pages-artifact@v3
         with:
           # Upload entire repository
           path: './'
@@ -69,4 +77,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v1
+        uses: actions/deploy-pages@v4
